@@ -1,0 +1,49 @@
+{
+  "data": {
+    "date": {
+      "created_at": "2025-02-17",
+      "updated_at": "2025-02-17"
+    },
+    "descriptions": {
+      "app_name": "Log Error Tracker",
+      "app_description": "Monitors server logs for errors and reports them to Telex channels",
+      "app_logo": "https://example.com/logo.png",
+      "app_url": "https://github.com/dax-side/smart-log-error-tracker",
+      "background_color": "#FF4444"
+    },
+    "integration_category": "Monitoring & Logging",
+    "integration_type": "interval",
+    "is_active": true,
+    "key_features": [
+      "Real-time log monitoring",
+      "Error severity classification",
+      "15-minute interval checks",
+      "Statistics tracking"
+    ],
+    "settings": [
+      {
+        "label": "interval",
+        "type": "text",
+        "required": true,
+        "default": "*/15 * * * *",
+        "description": "Check interval (crontab format)"
+      },
+      {
+        "label": "logPath",
+        "type": "text",
+        "description": "Path to the log file to monitor",
+        "required": true,
+        "default": "/var/log/nginx/error.log"
+      },
+      {
+        "label": "errorThreshold",
+        "type": "number",
+        "description": "Minimum error severity level to report",
+        "required": false,
+        "default": 1
+      }
+    ],
+    "tick_url": "YOUR_SERVER_URL/tick",
+    "target_url": "YOUR_SERVER_URL/webhook"
+  }
+}
