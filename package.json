@@ -1,4 +1,6 @@
 {
+
+  
   "name": "telex-log-error-tracker",
   "version": "1.0.0",
   "description": "A Telex integration for monitoring and reporting server log errors",
