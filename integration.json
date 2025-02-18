@@ -43,7 +43,7 @@
         "default": 1
       }
     ],
-    "tick_url": "YOUR_SERVER_URL/tick",
+    "tick_url": "https://smart-log-error-tracker-production.up.railway.app/test-results",
     "target_url": "YOUR_SERVER_URL/webhook"
   }
 }
