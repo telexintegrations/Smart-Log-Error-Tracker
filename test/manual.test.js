@@ -1,7 +1,6 @@
 const LogParser = require("../src/logParser");
 const config = require("../src/config");
 
-
 async function testNginxLogParsing() {
   console.log("=== Nginx Log Parser Test ===");
   console.log("Time:", new Date().toISOString());
