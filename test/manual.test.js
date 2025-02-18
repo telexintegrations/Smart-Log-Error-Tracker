@@ -1,5 +1,44 @@
+// const LogParser = require("../src/logParser");
+// const config = require("../src/config");
+
+// async function testNginxLogParsing() {
+//   console.log("=== Nginx Log Parser Test ===");
+//   console.log("Time:", new Date().toISOString());
+//   console.log("User:", "dax-side");
+//   console.log("\nConfig:");
+//   console.log("- Log Path:", config.logPath);
+//   console.log("- Error Threshold:", config.errorThreshold);
+//   console.log("- Format Style:", config.formatStyle);
+
+//   const parser = new LogParser(config);
+
+//   try {
+//     console.log("\nReading nginx logs...");
+//     const result = await parser.parseLogFile();
+
+//     console.log("\n=== Analysis Results ===");
+//     console.log(result.message);
+
+//     console.log("\n=== Parser Stats ===");
+//     const stats = parser.getStats();
+//     console.log("Total Checks:", stats.totalChecks);
+//     console.log("Total Errors Found:", stats.errorsFound);
+//     console.log("Average Errors/Check:", stats.averageErrorsPerCheck);
+//     console.log("Last Check:", stats.lastCheckTime.toISOString());
+//     console.log("Uptime (seconds):", stats.uptime);
+//   } catch (error) {
+//     console.error("\n❌ Test failed:");
+//     console.error("Error details:", error.message);
+//     console.error("Stack trace:", error.stack);
+//   }
+// }
+
+// // Run the test
+// testNginxLogParsing();
+
 const LogParser = require("../src/logParser");
 const config = require("../src/config");
+const fs = require("fs").promises;
 
 async function testNginxLogParsing() {
   console.log("=== Nginx Log Parser Test ===");
@@ -11,6 +50,7 @@ async function testNginxLogParsing() {
   console.log("- Format Style:", config.formatStyle);
 
   const parser = new LogParser(config);
+  let testResults = {};
 
   try {
     console.log("\nReading nginx logs...");
@@ -26,10 +66,49 @@ async function testNginxLogParsing() {
     console.log("Average Errors/Check:", stats.averageErrorsPerCheck);
     console.log("Last Check:", stats.lastCheckTime.toISOString());
     console.log("Uptime (seconds):", stats.uptime);
+
+    // Store all results in a JSON structure
+    testResults = {
+      config: {
+        logPath: config.logPath,
+        errorThreshold: config.errorThreshold,
+        formatStyle: config.formatStyle,
+      },
+      analysisResults: {
+        message: result.message,
+        type: result.type,
+      },
+      parserStats: {
+        totalChecks: stats.totalChecks,
+        totalErrorsFound: stats.errorsFound,
+        averageErrorsPerCheck: stats.averageErrorsPerCheck,
+        lastCheckTime: stats.lastCheckTime,
+        uptime: stats.uptime,
+      },
+    };
+
+    // Save results to JSON file
+    await fs.writeFile(
+      "test-results.json",
+      JSON.stringify(testResults, null, 2)
+    );
+
+    console.log("\nTest results have been saved to test-results.json");
   } catch (error) {
     console.error("\n❌ Test failed:");
     console.error("Error details:", error.message);
     console.error("Stack trace:", error.stack);
+
+    // Store error in JSON
+    testResults.error = {
+      message: error.message,
+      stack: error.stack,
+    };
+
+    await fs.writeFile(
+      "test-results.json",
+      JSON.stringify(testResults, null, 2)
+    );
   }
 }
 
