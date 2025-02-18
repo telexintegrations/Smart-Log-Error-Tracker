@@ -2,6 +2,7 @@ const LogParser = require("../src/logParser");
 const path = require("path");
 const fs = require("fs").promises;
 
+
 describe("LogParser with Nginx logs", () => {
   const nginxLogPath = "C:\\nginx-1.27.4\\logs\\error.log";
 
