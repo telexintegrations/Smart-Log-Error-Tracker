@@ -1,0 +1,27 @@
+{
+  "name": "telex-log-error-tracker",
+  "version": "1.0.0",
+  "description": "A Telex integration for monitoring and reporting server log errors",
+  "main": "src/index.js",
+  "scripts": {
+    "setup-dev": "node scripts/setup-dev.js",
+    "start": "node src/index.js",
+    "test": "cross-env NODE_ENV=test jest --detectOpenHandles --forceExit",
+    "test:watch": "cross-env NODE_ENV=test jest --watch",
+    "manual-test": "node test/manual-test.js",
+    "lint": "eslint src/"
+  },
+  "author": "dax-side",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "node-cron": "^3.0.0",
+    "supertest": "^7.0.0",
+    "winston": "^3.3.3"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "eslint": "^7.32.0",
+    "jest": "^27.0.6"
+  }
+}
