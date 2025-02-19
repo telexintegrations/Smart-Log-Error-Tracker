@@ -83,6 +83,7 @@
         "description": "Roles to notify on errors"
       }
     ],
-    "tick_url": "https://smart-log-error-tracker-production.up.railway.app/tick"
+    "tick_url": "https://smart-log-error-tracker-production.up.railway.app/tick",
+    "target-url":""
   }
 }
