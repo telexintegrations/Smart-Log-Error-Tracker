@@ -1,84 +1,90 @@
 const express = require("express");
-const cron = require("node-cron");
 const LogParser = require("./logParser");
 const config = require("./config");
-const fs = require("fs").promises;
-const path = require("path");
 
 function createApp() {
   const app = express();
-  const port = process.env.PORT || 3000;
-  const startTime = new Date();
-
+  app.use(express.json());
+  
   // Initialize log parser
   const logParser = new LogParser(config);
 
-  // Your existing endpoints
-  app.get("/status", (req, res) => {
-    const uptime = Math.floor((new Date() - startTime) / 1000);
+  // Integration JSON endpoint - Following Telex format
+  app.post("/integration.json", (req, res) => {
+    const baseUrl = `http://${req.get('host')}`;
     res.json({
-      status: "running",
-      uptime: uptime,
-      version: require("../package.json").version,
-      lastCheck: logParser.getLastCheckTime() || "No checks yet",
-      stats: logParser.getStats(),
-    });
-  });
-  // Updated endpoint for integration data from root directory
-  app.get("/integration", async (req, res) => {
-    try {
-      const integrationPath = path.join(__dirname, "..", "integration.json");
-      const integrationData = await fs.readFile(integrationPath, "utf8");
-      res.json(JSON.parse(integrationData)); // Using send instead of json to preserve the exact format
-    } catch (error) {
-      res.status(404).json({
-        error: "Integration data not found",
-        details: error.message,
-      });
-    }
-  });
-
-  // New endpoint to get test results
-  app.get("/test-results", async (req, res) => {
-    try {
-      const testResultsPath = path.join(
-        __dirname,
-        "..",
-        "test",
-        "test-results.json"
-      );
-      const testResults = await fs.readFile(testResultsPath, "utf8");
-      res.json(JSON.parse(testResults));
-    } catch (error) {
-      res.status(404).json({
-        error: "Test results not found. Please run manual.test.js first.",
-        details: error.message,
-      });
-    }
-  });
-
-  // Your existing webhook endpoint
-  app.post("/webhook", express.json(), async (req, res) => {
-    const result = await logParser.parseLogFile();
-    res.json(result);
-  });
-
-  // Your existing cron job
-  if (process.env.NODE_ENV !== "test") {
-    cron.schedule("*/15 * * * *", async () => {
-      try {
-        const result = await logParser.parseLogFile();
-        console.log("Scheduled check completed:", result);
-      } catch (error) {
-        console.error("Error in scheduled check:", error);
+      "data": {
+        "descriptions": {
+          "app_name": "Log Error Tracker",
+          "app_description": "Monitors server logs for errors and reports them to Telex channels",
+          "app_logo": "https://www.keycdn.com/img/blog/error-tracking.png",
+          "app_url": baseUrl,
+          "background_color": "#FF4444"
+        },
+        "integration_type": "interval",
+        "settings": [
+          {
+            "label": "logPath",
+            "type": "text",
+            "required": true,
+            "default": "/var/log/nginx/error.log",
+            "description": "Path to the log file to monitor"
+          },
+          {
+            "label": "errorThreshold",
+            "type": "number",
+            "required": true,
+            "default": "1",
+            "description": "Minimum error severity level to report"
+          },
+          {
+            "label": "interval",
+            "type": "text",
+            "required": true,
+            "default": "*/15 * * * *",
+            "description": "Check interval (crontab format)"
+          }
+        ],
+        "tick_url": `${baseUrl}/tick`
       }
     });
-  }
+  });
+
+  // Tick endpoint for interval-based checks
+  app.post("/tick", async (req, res) => {
+    try {
+      const payload = req.body;
+      // Start processing in background
+      res.status(202).json({ "status": "accepted" });
+      
+      // Parse logs and prepare response
+      const result = await logParser.parseLogFile();
+      
+      // Send results back to Telex using the return_url
+      const data = {
+        "message": result.summary || "No new errors detected",
+        "username": "Log Error Tracker",
+        "event_name": "Log Check",
+        "status": result.errors.length > 0 ? "error" : "success"
+      };
+
+      // Send results to Telex
+      await fetch(payload.return_url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+
+    } catch (error) {
+      console.error("Error in tick endpoint:", error);
+    }
+  });
 
   return app;
 }
 
-// Only start the server if this file is run directly
 if (require.main === module) {
   const app = createApp();
   const port = process.env.PORT || 3000;
