@@ -229,20 +229,17 @@ class LogParser {
     try {
       let logData;
       
-      if (process.env.NODE_ENV === 'test') {
-        logData = this.getMockLogs();
-      } else {
-        const response = await axios.get(this.config.logUrl, {
-          timeout: 5000,
-          retry: 3,
-          retryDelay: 1000
-        });
-        
-        if (!response.data) {
-          throw new Error('No log data received');
-        }
-        logData = response.data;
+      // Always use real server logs, remove test environment check
+      const response = await axios.get(this.config.logUrl, {
+        timeout: 5000,
+        retry: 3,
+        retryDelay: 1000
+      });
+      
+      if (!response.data) {
+        throw new Error('No log data received');
       }
+      logData = response.data;
 
       const lines = logData.split('\n').filter(line => line.trim());
       const errors = lines
@@ -257,13 +254,6 @@ class LogParser {
       throw error;
     }
   }
-
-  getMockLogs() {
-    return `2025/02/19 11:02:48 [error] 1234#5678: *123 test error message 1
-2025/02/19 11:02:47 [warning] 1234#5678: *124 test warning message
-2025/02/19 11:02:46 [error] 1234#5678: *125 test error message 2`;
-  }
-
   getStats() {
     return {
       ...this.stats,
