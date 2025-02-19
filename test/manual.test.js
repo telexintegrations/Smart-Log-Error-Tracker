@@ -1,9 +1,14 @@
 const LogParser = require("../src/logParser");
+const fs = require('fs').promises;
+const path = require('path');
 
 async function testNginxLogParsing() {
+  const timestamp = "2025-02-19 11:36:53";
+  const user = "dax-side";
+
   console.log("=== Nginx Log Parser Test ===");
-  console.log("Time:", "2025-02-19 11:27:42");
-  console.log("User:", "dax-side");
+  console.log("Time:", timestamp);
+  console.log("User:", user);
 
   // Configuration for development server
   const config = {
@@ -24,15 +29,26 @@ async function testNginxLogParsing() {
     console.log("✓ Successfully connected to server");
     console.log("✓ Parsed live log data");
 
-    // Output results
-    console.log("\n=== Test Results ===");
-    console.log(JSON.stringify({
-      timestamp: "2025-02-19 11:27:42",
-      user: "dax-side",
+    // Prepare test results
+    const testResults = {
+      timestamp,
+      user,
       server: config.logUrl,
       environment: config.environment,
+      status: "success",
       result: result
-    }, null, 2));
+    };
+
+    // Save results to test/test-results.json
+    const resultPath = path.join(__dirname, 'test-results.json');
+    await fs.writeFile(
+      resultPath,
+      JSON.stringify(testResults, null, 2)
+    );
+
+    console.log("\n✓ Results saved to:", resultPath);
+    console.log("\n=== Test Results ===");
+    console.log(JSON.stringify(testResults, null, 2));
 
     // Exit with success
     process.exit(0);
@@ -41,14 +57,15 @@ async function testNginxLogParsing() {
     console.error("\n❌ Test failed:");
     console.error("Error connecting to server:", error.message);
     
-    // Write error details
-    const fs = require('fs').promises;
+    // Save error details to test/test-results.json
+    const resultPath = path.join(__dirname, 'test-results.json');
     await fs.writeFile(
-      'test-results.json',
+      resultPath,
       JSON.stringify({
-        timestamp: "2025-02-19 11:27:42",
-        user: "dax-side",
+        timestamp,
+        user,
         server: config.logUrl,
+        status: "error",
         error: {
           message: error.message,
           stack: error.stack
@@ -56,6 +73,7 @@ async function testNginxLogParsing() {
       }, null, 2)
     );
 
+    console.error("\n✗ Error details saved to:", resultPath);
     // Exit with error
     process.exit(1);
   }
