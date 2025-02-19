@@ -12,16 +12,44 @@ function createApp() {
   // Initialize log parser
   const logParser = new LogParser(config);
 
-  // Integration JSON endpoint - Following Telex format
-  // Change this from POST to GET
-app.get("/integration.json", async (req, res) => {
+    // Integration JSON endpoint - Reading from file with proper path resolution
+  app.get("/integration.json", async (req, res) => {
     try {
-      // Using __dirname to get the current directory
-      const integrationPath = path.join(__dirname, "integration.json");
-      console.log("Looking for integration.json at:", integrationPath); // Debug log
-      
-      const integrationData = await fs.readFile(integrationPath, "utf8");
+      // Try multiple possible paths for the integration.json file
+      const possiblePaths = [
+        path.join(__dirname, "integration.json"),          // /app/src/integration.json
+        path.join(__dirname, "..", "integration.json"),    // /app/integration.json
+        path.join(process.cwd(), "integration.json")       // Current working directory
+      ];
+
+      let integrationData = null;
+      let loadedPath = null;
+
+      // Try each path until we find the file
+      for (const filePath of possiblePaths) {
+        try {
+          integrationData = await fs.readFile(filePath, "utf8");
+          loadedPath = filePath;
+          console.log("Successfully loaded integration.json from:", filePath);
+          break;
+        } catch (err) {
+          console.log("Tried path:", filePath, "- Not found");
+          continue;
+        }
+      }
+
+      if (!integrationData) {
+        throw new Error("integration.json not found in any expected location");
+      }
+
       const data = JSON.parse(integrationData);
+      
+      // Update timestamps
+      const now = "2025-02-19 23:24:50"; // Using the current UTC time you provided
+      data.data.date = {
+        created_at: now,
+        updated_at: now
+      };
       
       // Update the base URL dynamically
       const baseUrl = `http://${req.get('host')}`;
@@ -30,13 +58,14 @@ app.get("/integration.json", async (req, res) => {
       
       res.json(data);
     } catch (error) {
-      console.error("Error reading integration.json:", error); // Debug log
+      console.error("Error reading integration.json:", error);
       res.status(404).json({
         error: "Integration configuration not found",
         details: error.message,
+        searchedPaths: possiblePaths
       });
     }
-  }); // Tick endpoint for interval-based checks
+  });
   
   app.post("/tick", async (req, res) => {
     try {
