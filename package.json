@@ -5,20 +5,13 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "test": "node test/manual.test.js",
+    "test": "node test/manual.test.js"
   },
   "author": "dax-side",
   "license": "MIT",
   "dependencies": {
     "axios": "^1.7.9",
     "express": "^4.17.1",
-    "node-cron": "^3.0.0",
-    "supertest": "^7.0.0",
-    "winston": "^3.3.3"
-  },
-  "devDependencies": {
-    "cross-env": "^7.0.3",
-    "eslint": "^7.32.0",
-    "jest": "^27.0.6"
+    "node-cron": "^3.0.0"
   }
 }
