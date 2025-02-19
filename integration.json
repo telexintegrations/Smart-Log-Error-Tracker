@@ -1,4 +1,3 @@
-// Change this from POST to GET
 app.get("/integration.json", (req, res) => {
   const baseUrl = `http://${req.get('host')}`;
   res.json({
