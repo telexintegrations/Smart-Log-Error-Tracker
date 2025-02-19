@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [ main ]
 
+# Use default GITHUB_TOKEN permissions
+permissions:
+  contents: write  # Needed for pushing changes
+  actions: read    # For reading workflow info
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -13,8 +18,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        # Need write permissions to push changes
-        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0   # Get all history for proper updates
     
     - name: Use Node.js
       uses: actions/setup-node@v4
@@ -28,45 +32,32 @@ jobs:
     - name: Run tests
       run: npm test
       
-    - name: Upload test results artifact
+    - name: Upload test results
       uses: actions/upload-artifact@v4
       with:
-        name: test-results-2025-02-19-121905
+        name: test-results-2025-02-19-123309
         path: test/test-results.json
         retention-days: 14
         compression-level: 6
         overwrite: true
         if-no-files-found: warn
 
-    - name: Commit test results
+    - name: Push test results
+      if: github.event_name != 'pull_request'
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
+        git pull origin main
         git add test/test-results.json
-        git commit -m "test: update test results
+        git commit -m "test: update results from CI run
 
-        Timestamp: 2025-02-19 12:19:05
+        Timestamp: 2025-02-19 12:33:09
         User: dax-side
 
-        - Update test results from CI run
-        - Store latest parser stats
-        - Update error analysis
-        - Save current timestamp" || echo "No changes to commit"
-        git push
-
-    - name: Update repository with test results
-      if: success()
-      uses: EndBug/add-and-commit@v9
-      with:
-        add: 'test/test-results.json'
-        message: 'test: update test results [skip ci]
-
-        Timestamp: 2025-02-19 12:19:05
-        User: dax-side
-
-        - Store CI test results
+        - Store test execution results
         - Update parser statistics
-        - Save error analysis
-        - Record current timestamp'
-        default_author: github_actions
-        push: true
+        - Record current timestamp
+        - CI run: ${GITHUB_RUN_ID}" || echo "No changes to commit"
+        git push
+      env:
+        GITHUB_TOKEN: ${{ github.token }}  # Use default token
