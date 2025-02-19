@@ -40,20 +40,34 @@ const LogParser = require("../src/logParser");
 const config = require("../src/config");
 const fs = require("fs").promises;
 
+// async function testNginxLogParsing() {
+//   console.log("=== Nginx Log Parser Test ===");
+//   console.log("Time:", new Date().toISOString());
+//   console.log("User:", "dax-side");
+//   console.log("\nConfig:");
+//   console.log("- Log Path:", config.logPath);
+//   console.log("- Error Threshold:", config.errorThreshold);
+//   console.log("- Format Style:", config.formatStyle);
+
+//   const parser = new LogParser(config);
+//   let testResults = {};
+
+//   try {
+//     console.log("\nReading nginx logs...");
+//     const result = await parser.parseLogFile();
 async function testNginxLogParsing() {
   console.log("=== Nginx Log Parser Test ===");
   console.log("Time:", new Date().toISOString());
   console.log("User:", "dax-side");
   console.log("\nConfig:");
-  console.log("- Log Path:", config.logPath);
+  console.log("- Log URL:", config.logUrl);
   console.log("- Error Threshold:", config.errorThreshold);
   console.log("- Format Style:", config.formatStyle);
 
   const parser = new LogParser(config);
-  let testResults = {};
 
   try {
-    console.log("\nReading nginx logs...");
+    console.log("\nFetching nginx logs...");
     const result = await parser.parseLogFile();
 
     console.log("\n=== Analysis Results ===");
@@ -70,7 +84,7 @@ async function testNginxLogParsing() {
     // Store all results in a JSON structure
     testResults = {
       config: {
-        logPath: config.logPath,
+        logPath: "/var/log/nginx/error.log", // Updated path
         errorThreshold: config.errorThreshold,
         formatStyle: config.formatStyle,
       },
