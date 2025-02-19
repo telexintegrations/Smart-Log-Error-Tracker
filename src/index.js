@@ -1,6 +1,9 @@
 const express = require("express");
 const LogParser = require("./logParser");
 const config = require("./config");
+const path = require("path");  // Add this import
+const fs = require("fs").promises;  // Add this import
+
 
 function createApp() {
   const app = express();
@@ -11,27 +14,30 @@ function createApp() {
 
   // Integration JSON endpoint - Following Telex format
   // Change this from POST to GET
-// Updated endpoint for integration.json
 app.get("/integration.json", async (req, res) => {
-  try {
-    const integrationPath = path.join(__dirname, "..", "integration.json");
-    const integrationData = await fs.readFile(integrationPath, "utf8");
-    const data = JSON.parse(integrationData);
-    
-    // Update the base URL dynamically
-    const baseUrl = `http://${req.get('host')}`;
-    data.data.descriptions.app_url = baseUrl;
-    data.data.tick_url = `${baseUrl}/tick`;
-    
-    res.json(data);
-  } catch (error) {
-    res.status(404).json({
-      error: "Integration configuration not found",
-      details: error.message,
-    });
-  }
-});
-  // Tick endpoint for interval-based checks
+    try {
+      // Using __dirname to get the current directory
+      const integrationPath = path.join(__dirname, "integration.json");
+      console.log("Looking for integration.json at:", integrationPath); // Debug log
+      
+      const integrationData = await fs.readFile(integrationPath, "utf8");
+      const data = JSON.parse(integrationData);
+      
+      // Update the base URL dynamically
+      const baseUrl = `http://${req.get('host')}`;
+      data.data.descriptions.app_url = baseUrl;
+      data.data.tick_url = `${baseUrl}/tick`;
+      
+      res.json(data);
+    } catch (error) {
+      console.error("Error reading integration.json:", error); // Debug log
+      res.status(404).json({
+        error: "Integration configuration not found",
+        details: error.message,
+      });
+    }
+  }); // Tick endpoint for interval-based checks
+  
   app.post("/tick", async (req, res) => {
     try {
       const payload = req.body;
