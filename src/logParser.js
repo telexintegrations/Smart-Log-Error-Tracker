@@ -209,39 +209,47 @@ class LogParser {
     };
   }
 
-  async parseLogFile() {
+   async parseLogFile() {
     try {
-      // Make HTTP request to get logs from the server
-      const response = await axios.get(this.config.logUrl, {
-        timeout: 5000,
-        retry: 3,
-        retryDelay: 1000
-      });
-      if (!response.data) {
-        throw new Error('No log data received');
+      let logData;
+      
+      if (process.env.NODE_ENV === 'development') {
+        // Use mock data in test environment
+        logData = this.getMockLogs();
+      } else {
+        // Make HTTP request to get logs from the server
+        const response = await axios.get(this.config.logUrl, {
+          timeout: 5000,
+          retry: 3,
+          retryDelay: 1000
+        });
+        
+        if (!response.data) {
+          throw new Error('No log data received');
+        }
+        logData = response.data;
       }
 
-      return this.processLogs(response.data);
+      // Process and analyze logs
+      const lines = logData.split('\n').filter(line => line.trim());
+      const errors = lines
+        .map(line => this.parseLogLine(line))
+        .filter(error => error !== null);
+
+      // Update stats and return formatted report
+      this.updateStats(errors);
+      return this.formatForTelex(errors);
+
     } catch (error) {
-      if (process.env.NODE_ENV === 'test') {
-        // Use mock data in test environment
-        return this.processLogs(this.getMockLogs());
-      }
-      throw new Error(`Failed to fetch logs: ${error.message}`);
+      console.error("Error parsing log file:", error);
+      throw error;
     }
   }
 
-  processLogs(logData) {
-    // Process and analyze logs
-    const lines = logData.split('\n').filter(line => line.trim());
-    const errors = this.parseErrors(lines);
-    return this.generateReport(errors);
-  }
-
   getMockLogs() {
-    return `2025/02/19 10:39:46 [error] 1234#5678: *123 test error message 1
-2025/02/19 10:39:45 [warning] 1234#5678: *124 test warning message
-2025/02/19 10:39:44 [error] 1234#5678: *125 test error message 2`;
+    return `2025/02/19 10:55:52 [error] 1234#5678: *123 test error message 1
+2025/02/19 10:55:51 [warning] 1234#5678: *124 test warning message
+2025/02/19 10:55:50 [error] 1234#5678: *125 test error message 2`;
   }
       this.updateStats(errors);
 
