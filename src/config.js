@@ -2,16 +2,16 @@ const path = require("path");
 
 const config = {
   development: {
-    // Point to actual nginx error log
-    logPath: "C:\\nginx-1.27.4\\logs\\error.log",
+    // Use URL instead of file path
+    logUrl: "http://16.171.58.193/logs",
     errorThreshold: "Low",
     formatStyle: "Detailed",
     enableStats: true,
     summaryPath: path.join(__dirname, "..", "logs", "error-summary.json"),
   },
   test: {
-    // Keep test config for running tests
-    logPath: "C:\\nginx-1.27.4\\logs\\error.log",
+    // Use URL for test environment too
+    logUrl: "http://16.171.58.193/logs",
     errorThreshold: "Low",
     formatStyle: "Detailed",
     enableStats: true,
