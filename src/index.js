@@ -83,7 +83,7 @@ if (require.main === module) {
   const app = createApp();
   const port = process.env.PORT || 3000;
   app.listen(port, () => {
-    console.log(`Log Error Tracker listening at http://localhost:${port}`);
+    console.log(`Log Error Tracker listening at http://16.171.58.193:${port}`);
   });
 }
 
