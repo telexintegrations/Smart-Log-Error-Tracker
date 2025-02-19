@@ -66,6 +66,21 @@ function createApp() {
       });
     }
   });
+
+    // Add the webhook endpoint here
+  app.post("/webhook", (req, res) => {
+    console.log("Received webhook call:", {
+      timestamp: new Date().toISOString(),
+      body: req.body
+    });
+
+    // Acknowledge receipt of webhook
+    res.status(200).json({
+      status: "received",
+      message: "Webhook received successfully"
+    });
+  });
+
   
   app.post("/tick", async (req, res) => {
     try {
