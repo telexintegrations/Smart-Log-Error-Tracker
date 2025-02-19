@@ -84,6 +84,6 @@
       }
     ],
     "tick_url": "https://smart-log-error-tracker-production.up.railway.app/tick",
-    "target-url":""
+    "target-url":"https://smart-log-error-tracker-production.up.railway.app/webhook"
   }
 }
