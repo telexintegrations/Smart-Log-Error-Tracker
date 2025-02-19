@@ -2,7 +2,6 @@ const axios = require("axios");
 const fs = require("fs").promises;
 const path = require("path");
 
-
 class LogParser {
   constructor(config) {
     this.config = config;
