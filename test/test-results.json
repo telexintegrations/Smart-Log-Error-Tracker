@@ -1,8 +1,20 @@
 {
   "timestamp": "2025-02-19 12:00:45",
   "user": "dax-side",
-  "error": {
-    "message": "timeout of 5000ms exceeded",
-    "stack": "AxiosError: timeout of 5000ms exceeded\n    at RedirectableRequest.handleRequestTimeout (/home/runner/work/Smart-Log-Error-Tracker/Smart-Log-Error-Tracker/node_modules/axios/dist/node/axios.cjs:3200:16)\n    at RedirectableRequest.emit (node:events:513:28)\n    at Timeout.<anonymous> (/home/runner/work/Smart-Log-Error-Tracker/Smart-Log-Error-Tracker/node_modules/follow-redirects/index.js:221:12)\n    at listOnTimeout (node:internal/timers:559:17)\n    at processTimers (node:internal/timers:502:7)\n    at Axios.request (/home/runner/work/Smart-Log-Error-Tracker/Smart-Log-Error-Tracker/node_modules/axios/dist/node/axios.cjs:4252:41)\n    at runNextTicks (node:internal/process/task_queues:61:5)\n    at listOnTimeout (node:internal/timers:528:9)\n    at processTimers (node:internal/timers:502:7)\n    at async LogParser.parseLogFile (/home/runner/work/Smart-Log-Error-Tracker/Smart-Log-Error-Tracker/src/logParser.js:233:24)\n    at async testNginxLogParsing (/home/runner/work/Smart-Log-Error-Tracker/Smart-Log-Error-Tracker/test/manual.test.js:22:20)"
+  "config": {
+    "logPath": "/var/log/nginx/error.log",
+    "errorThreshold": "Low",
+    "formatStyle": "Detailed"
+  },
+  "analysisResults": {
+    "message": "🔍 Nginx Log Analysis Report:\nTime: 2025-02-19T17:50:27.693Z\n\nError Trends:\n✅ Error rate stable\nLast Hour: 0 errors\nLast 24 Hours: 23 errors\nAverage errors per hour: 0.96\n\nFound 23 errors in last 24 hours (23 total):\n🔴 Emergency/Critical: 0\n🔴 Error: 23\n🟡 Warning: 0\n🟢 Notice: 0\n\nError Categories:\n- Connection Issues: 0\n- Filesystem Issues: 0\n- Process Signals: 0\n- Other Issues: 23\n\nFailed URLs:\n- GET / HTTP/1.1 (15 times)\n- GET / HTTP/1.0 (4 times)\n- POST / HTTP/1.1 (2 times)\n\nMost Recent Errors:\n🔴 [ERROR] 2025/02/19 13:01:46 - Process 2479 *535 directory index of \"/var/www/html/\" is forbidden, client: 66.63.187.168, server: 16.171.58.193, request: \"POST / HTTP/1.1\", host: \"16.171.58.193\"\n\nNote: Showing most recent errors from each category.",
+    "type": "info"
+  },
+  "parserStats": {
+    "totalChecks": 1,
+    "totalErrorsFound": 23,
+    "averageErrorsPerCheck": "23.00",
+    "lastCheckTime": "2025-02-19T17:50:27.691Z",
+    "uptime": 0
   }
 }
