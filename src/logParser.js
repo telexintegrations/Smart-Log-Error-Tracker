@@ -1,3 +1,4 @@
+const axios = require("axios");
 const fs = require("fs").promises;
 const path = require("path");
 
@@ -210,9 +211,12 @@ class LogParser {
 
   async parseLogFile() {
     try {
-      const content = await fs.readFile(this.config.logPath, "utf8");
-      const lines = content.split("\n").filter((line) => line.trim());
+      // Make HTTP request to get logs from the server
+      const response = await axios.get("http://16.171.58.193/logs");
+      const content = response.data;
 
+      // Rest of your existing parsing logic
+      const lines = content.split("\n").filter((line) => line.trim());
       const errors = lines
         .map((line) => this.parseLogLine(line))
         .filter((error) => error !== null);
