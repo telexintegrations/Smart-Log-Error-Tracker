@@ -3,7 +3,7 @@ const path = require("path");
 const config = {
   development: {
     // Use URL instead of file path
-    logUrl: "http://16.171.58.193/logs",
+    logUrl: "http://16.171.62.147/logs",
     errorThreshold: "Low",
     formatStyle: "Detailed",
     enableStats: true,
@@ -11,7 +11,7 @@ const config = {
   },
   test: {
     // Use URL for test environment too
-    logUrl: "http://16.171.58.193/logs",
+    logUrl: "http://16.171.62.147/logs",
     errorThreshold: "Low",
     formatStyle: "Detailed",
     enableStats: true,
