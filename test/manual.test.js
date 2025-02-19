@@ -1,81 +1,95 @@
 const LogParser = require("../src/logParser");
-const fs = require('fs').promises;
-const path = require('path');
+const config = require("../src/config");
+const fs = require("fs").promises;
+const path = require("path");
 
 async function testNginxLogParsing() {
-  const timestamp = "2025-02-19 11:36:53";
+  const timestamp = "2025-02-19 11:47:52";
   const user = "dax-side";
 
   console.log("=== Nginx Log Parser Test ===");
   console.log("Time:", timestamp);
   console.log("User:", user);
-
-  // Configuration for development server
-  const config = {
-    logUrl: "http://16.171.58.193/logs",
-    environment: "development"
-  };
+  console.log("\nConfig:");
+  console.log("- Log URL:", config.logUrl);
+  console.log("- Error Threshold:", config.errorThreshold);
+  console.log("- Format Style:", config.formatStyle);
 
   const parser = new LogParser(config);
 
   try {
-    console.log("\nConnecting to development server...");
-    console.log("Server URL:", config.logUrl);
-    
-    // Test live log parsing
-    console.log("\nParsing live logs...");
+    console.log("\nFetching nginx logs...");
     const result = await parser.parseLogFile();
-    
-    console.log("✓ Successfully connected to server");
-    console.log("✓ Parsed live log data");
 
-    // Prepare test results
+    console.log("\n=== Analysis Results ===");
+    console.log(result.message);
+
+    console.log("\n=== Parser Stats ===");
+    const stats = parser.getStats();
+    console.log("Total Checks:", stats.totalChecks);
+    console.log("Total Errors Found:", stats.errorsFound);
+    console.log("Average Errors/Check:", stats.averageErrorsPerCheck);
+    console.log("Last Check:", stats.lastCheckTime.toISOString());
+    console.log("Uptime (seconds):", stats.uptime);
+
+    // Store all results in a JSON structure
     const testResults = {
       timestamp,
       user,
-      server: config.logUrl,
-      environment: config.environment,
-      status: "success",
-      result: result
+      config: {
+        logPath: "/var/log/nginx/error.log",
+        errorThreshold: config.errorThreshold,
+        formatStyle: config.formatStyle,
+      },
+      analysisResults: {
+        message: result.message,
+        type: result.type,
+      },
+      parserStats: {
+        totalChecks: stats.totalChecks,
+        totalErrorsFound: stats.errorsFound,
+        averageErrorsPerCheck: stats.averageErrorsPerCheck,
+        lastCheckTime: stats.lastCheckTime,
+        uptime: stats.uptime,
+      },
     };
 
-    // Save results to test/test-results.json
+    // Save results to JSON file in test folder
     const resultPath = path.join(__dirname, 'test-results.json');
     await fs.writeFile(
       resultPath,
       JSON.stringify(testResults, null, 2)
     );
 
-    console.log("\n✓ Results saved to:", resultPath);
-    console.log("\n=== Test Results ===");
-    console.log(JSON.stringify(testResults, null, 2));
-
-    // Exit with success
-    process.exit(0);
-
+    console.log("\nTest results have been saved to:", resultPath);
   } catch (error) {
     console.error("\n❌ Test failed:");
-    console.error("Error connecting to server:", error.message);
-    
-    // Save error details to test/test-results.json
+    console.error("Error details:", error.message);
+    console.error("Stack trace:", error.stack);
+
+    // Store error in JSON
+    const testResults = {
+      timestamp,
+      user,
+      config: {
+        logPath: "/var/log/nginx/error.log",
+        errorThreshold: config.errorThreshold,
+        formatStyle: config.formatStyle,
+      },
+      error: {
+        message: error.message,
+        stack: error.stack,
+      }
+    };
+
+    // Save error results to JSON file in test folder
     const resultPath = path.join(__dirname, 'test-results.json');
     await fs.writeFile(
       resultPath,
-      JSON.stringify({
-        timestamp,
-        user,
-        server: config.logUrl,
-        status: "error",
-        error: {
-          message: error.message,
-          stack: error.stack
-        }
-      }, null, 2)
+      JSON.stringify(testResults, null, 2)
     );
 
     console.error("\n✗ Error details saved to:", resultPath);
-    // Exit with error
-    process.exit(1);
   }
 }
 
