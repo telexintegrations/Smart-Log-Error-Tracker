@@ -7,7 +7,7 @@
     "descriptions": {
       "app_name": "Log Error Tracker",
       "app_description": "Monitors server logs for errors and reports them to Telex channels",
-      "app_logo": "https://example.com/logo.png",
+      "app_logo": "https://www.keycdn.com/img/blog/error-tracking.png",
       "app_url": "https://github.com/telexintegrations/Smart-Log-Error-Tracker",
       "background_color": "#FF4444"
     },
