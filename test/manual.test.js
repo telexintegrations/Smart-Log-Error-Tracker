@@ -4,7 +4,7 @@ const fs = require("fs").promises;
 const path = require("path");
 
 async function testNginxLogParsing() {
-  const timestamp = "2025-02-19 11:47:52";
+  const timestamp = "2025-02-19 12:00:45";
   const user = "dax-side";
 
   console.log("=== Nginx Log Parser Test ===");
@@ -41,21 +41,22 @@ async function testNginxLogParsing() {
         errorThreshold: config.errorThreshold,
         formatStyle: config.formatStyle,
       },
-      analysisResults: {
-        message: result.message,
-        type: result.type,
-      },
+      analysisResults: result,
       parserStats: {
         totalChecks: stats.totalChecks,
         totalErrorsFound: stats.errorsFound,
         averageErrorsPerCheck: stats.averageErrorsPerCheck,
         lastCheckTime: stats.lastCheckTime,
         uptime: stats.uptime,
-      },
+      }
     };
 
+    // Create test directory if it doesn't exist
+    const testDir = path.join(process.cwd(), 'test');
+    await fs.mkdir(testDir, { recursive: true });
+
     // Save results to JSON file in test folder
-    const resultPath = path.join(__dirname, 'test-results.json');
+    const resultPath = path.join(testDir, 'test-results.json');
     await fs.writeFile(
       resultPath,
       JSON.stringify(testResults, null, 2)
@@ -71,19 +72,18 @@ async function testNginxLogParsing() {
     const testResults = {
       timestamp,
       user,
-      config: {
-        logPath: "/var/log/nginx/error.log",
-        errorThreshold: config.errorThreshold,
-        formatStyle: config.formatStyle,
-      },
       error: {
         message: error.message,
         stack: error.stack,
       }
     };
 
+    // Create test directory if it doesn't exist
+    const testDir = path.join(process.cwd(), 'test');
+    await fs.mkdir(testDir, { recursive: true });
+
     // Save error results to JSON file in test folder
-    const resultPath = path.join(__dirname, 'test-results.json');
+    const resultPath = path.join(testDir, 'test-results.json');
     await fs.writeFile(
       resultPath,
       JSON.stringify(testResults, null, 2)
