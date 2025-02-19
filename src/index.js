@@ -10,45 +10,46 @@ function createApp() {
   const logParser = new LogParser(config);
 
   // Integration JSON endpoint - Following Telex format
-  app.post("/integration.json", (req, res) => {
-    const baseUrl = `http://${req.get('host')}`;
-    res.json({
-      "data": {
-        "descriptions": {
-          "app_name": "Log Error Tracker",
-          "app_description": "Monitors server logs for errors and reports them to Telex channels",
-          "app_logo": "https://www.keycdn.com/img/blog/error-tracking.png",
-          "app_url": baseUrl,
-          "background_color": "#FF4444"
+  // Change this from POST to GET
+app.get("/integration.json", (req, res) => {
+  const baseUrl = `http://${req.get('host')}`;
+  res.json({
+    "data": {
+      "descriptions": {
+        "app_name": "Log Error Tracker",
+        "app_description": "Monitors server logs for errors and reports them to Telex channels",
+        "app_logo": "https://www.keycdn.com/img/blog/error-tracking.png",
+        "app_url": baseUrl,
+        "background_color": "#FF4444"
+      },
+      "integration_type": "interval",
+      "settings": [
+        {
+          "label": "logPath",
+          "type": "text",
+          "required": true,
+          "default": "/var/log/nginx/error.log",
+          "description": "Path to the log file to monitor"
         },
-        "integration_type": "interval",
-        "settings": [
-          {
-            "label": "logPath",
-            "type": "text",
-            "required": true,
-            "default": "/var/log/nginx/error.log",
-            "description": "Path to the log file to monitor"
-          },
-          {
-            "label": "errorThreshold",
-            "type": "number",
-            "required": true,
-            "default": "1",
-            "description": "Minimum error severity level to report"
-          },
-          {
-            "label": "interval",
-            "type": "text",
-            "required": true,
-            "default": "*/15 * * * *",
-            "description": "Check interval (crontab format)"
-          }
-        ],
-        "tick_url": `${baseUrl}/tick`
-      }
-    });
+        {
+          "label": "errorThreshold",
+          "type": "number",
+          "required": true,
+          "default": "1",
+          "description": "Minimum error severity level to report"
+        },
+        {
+          "label": "interval",
+          "type": "text",
+          "required": true,
+          "default": "*/15 * * * *",
+          "description": "Check interval (crontab format)"
+        }
+      ],
+      "tick_url": `${baseUrl}/tick`
+    }
   });
+});
 
   // Tick endpoint for interval-based checks
   app.post("/tick", async (req, res) => {
