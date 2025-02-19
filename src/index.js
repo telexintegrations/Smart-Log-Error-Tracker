@@ -11,46 +11,26 @@ function createApp() {
 
   // Integration JSON endpoint - Following Telex format
   // Change this from POST to GET
-app.get("/integration.json", (req, res) => {
-  const baseUrl = `http://${req.get('host')}`;
-  res.json({
-    "data": {
-      "descriptions": {
-        "app_name": "Log Error Tracker",
-        "app_description": "Monitors server logs for errors and reports them to Telex channels",
-        "app_logo": "https://www.keycdn.com/img/blog/error-tracking.png",
-        "app_url": baseUrl,
-        "background_color": "#FF4444"
-      },
-      "integration_type": "interval",
-      "settings": [
-        {
-          "label": "logPath",
-          "type": "text",
-          "required": true,
-          "default": "/var/log/nginx/error.log",
-          "description": "Path to the log file to monitor"
-        },
-        {
-          "label": "errorThreshold",
-          "type": "number",
-          "required": true,
-          "default": "1",
-          "description": "Minimum error severity level to report"
-        },
-        {
-          "label": "interval",
-          "type": "text",
-          "required": true,
-          "default": "*/15 * * * *",
-          "description": "Check interval (crontab format)"
-        }
-      ],
-      "tick_url": `${baseUrl}/tick`
-    }
-  });
+// Updated endpoint for integration.json
+app.get("/integration.json", async (req, res) => {
+  try {
+    const integrationPath = path.join(__dirname, "..", "integration.json");
+    const integrationData = await fs.readFile(integrationPath, "utf8");
+    const data = JSON.parse(integrationData);
+    
+    // Update the base URL dynamically
+    const baseUrl = `http://${req.get('host')}`;
+    data.data.descriptions.app_url = baseUrl;
+    data.data.tick_url = `${baseUrl}/tick`;
+    
+    res.json(data);
+  } catch (error) {
+    res.status(404).json({
+      error: "Integration configuration not found",
+      details: error.message,
+    });
+  }
 });
-
   // Tick endpoint for interval-based checks
   app.post("/tick", async (req, res) => {
     try {
