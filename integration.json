@@ -1,36 +1,40 @@
-{
-  "data": {
-    "descriptions": {
-      "app_name": "Log Error Tracker",
-      "app_description": "Monitors server logs for errors and reports them to Telex channels",
-      "app_logo": "https://www.keycdn.com/img/blog/error-tracking.png",
-      "app_url": "https://smart-log-error-tracker-production.up.railway.app",
-      "background_color": "#FF4444"
-    },
-    "integration_type": "interval",
-    "settings": [
-      {
-        "label": "logPath",
-        "type": "text",
-        "required": true,
-        "default": "/var/log/nginx/error.log",
-        "description": "Path to the log file to monitor"
+// Change this from POST to GET
+app.get("/integration.json", (req, res) => {
+  const baseUrl = `http://${req.get('host')}`;
+  res.json({
+    "data": {
+      "descriptions": {
+        "app_name": "Log Error Tracker",
+        "app_description": "Monitors server logs for errors and reports them to Telex channels",
+        "app_logo": "https://www.keycdn.com/img/blog/error-tracking.png",
+        "app_url": baseUrl,
+        "background_color": "#FF4444"
       },
-      {
-        "label": "errorThreshold",
-        "type": "number",
-        "required": true,
-        "default": "1",
-        "description": "Minimum error severity level to report"
-      },
-      {
-        "label": "interval",
-        "type": "text",
-        "required": true,
-        "default": "*/15 * * * *",
-        "description": "Check interval (crontab format)"
-      }
-    ],
-    "tick_url": "https://smart-log-error-tracker-production.up.railway.app/tick"
-  }
-}
+      "integration_type": "interval",
+      "settings": [
+        {
+          "label": "logPath",
+          "type": "text",
+          "required": true,
+          "default": "/var/log/nginx/error.log",
+          "description": "Path to the log file to monitor"
+        },
+        {
+          "label": "errorThreshold",
+          "type": "number",
+          "required": true,
+          "default": "1",
+          "description": "Minimum error severity level to report"
+        },
+        {
+          "label": "interval",
+          "type": "text",
+          "required": true,
+          "default": "*/15 * * * *",
+          "description": "Check interval (crontab format)"
+        }
+      ],
+      "tick_url": `${baseUrl}/tick`
+    }
+  });
+});
