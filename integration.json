@@ -8,7 +8,7 @@
       "app_name": "Log Error Tracker",
       "app_description": "Monitors server logs for errors and reports them to Telex channels",
       "app_logo": "https://example.com/logo.png",
-      "app_url": "https://github.com/dax-side/smart-log-error-tracker",
+      "app_url": "https://github.com/telexintegrations/Smart-Log-Error-Tracker",
       "background_color": "#FF4444"
     },
     "integration_category": "Monitoring & Logging",
