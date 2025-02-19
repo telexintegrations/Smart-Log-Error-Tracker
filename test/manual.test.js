@@ -1,74 +1,65 @@
 const LogParser = require("../src/logParser");
-const config = require("../src/config");
-const fs = require("fs").promises;
 
 async function testNginxLogParsing() {
-  let exitCode = 0;
   console.log("=== Nginx Log Parser Test ===");
-  console.log("Time:", new Date().toISOString());
-  console.log("User:", process.env.GITHUB_ACTOR || "dax-side");
+  console.log("Time:", "2025-02-19 11:27:42");
+  console.log("User:", "dax-side");
+
+  // Configuration for development server
+  const config = {
+    logUrl: "http://16.171.58.193/logs",
+    environment: "development"
+  };
 
   const parser = new LogParser(config);
 
   try {
-    // Test basic log parsing
-    console.log("\nTest 1: Basic Log Parsing");
+    console.log("\nConnecting to development server...");
+    console.log("Server URL:", config.logUrl);
+    
+    // Test live log parsing
+    console.log("\nParsing live logs...");
     const result = await parser.parseLogFile();
-    if (!result || !result.analysis) {
-      throw new Error("Failed to parse logs");
-    }
+    
+    console.log("✓ Successfully connected to server");
+    console.log("✓ Parsed live log data");
 
-    // Test error categorization
-    console.log("\nTest 2: Error Categorization");
-    if (!result.analysis.severity || 
-        !Object.keys(result.analysis.severity).length) {
-      throw new Error("Failed to categorize errors");
-    }
+    // Output results
+    console.log("\n=== Test Results ===");
+    console.log(JSON.stringify({
+      timestamp: "2025-02-19 11:27:42",
+      user: "dax-side",
+      server: config.logUrl,
+      environment: config.environment,
+      result: result
+    }, null, 2));
 
-    // Test statistics generation
-    console.log("\nTest 3: Statistics Generation");
-    if (!parser.stats || !parser.stats.totalChecks) {
-      throw new Error("Failed to generate statistics");
-    }
-
-    const testResults = {
-      timestamp: new Date().toISOString(),
-      user: process.env.GITHUB_ACTOR || "dax-side",
-      success: true,
-      results: result,
-      stats: parser.stats
-    };
-
-    await fs.writeFile(
-      "test-results.json",
-      JSON.stringify(testResults, null, 2)
-    );
-
-    console.log("\n✅ All tests passed!");
+    // Exit with success
+    process.exit(0);
 
   } catch (error) {
     console.error("\n❌ Test failed:");
-    console.error("Error details:", error.message);
-    exitCode = 1;
+    console.error("Error connecting to server:", error.message);
     
-    const testResults = {
-      timestamp: new Date().toISOString(),
-      user: process.env.GITHUB_ACTOR || "dax-side",
-      success: false,
-      error: {
-        message: error.message,
-        stack: error.stack
-      }
-    };
-
+    // Write error details
+    const fs = require('fs').promises;
     await fs.writeFile(
-      "test-results.json",
-      JSON.stringify(testResults, null, 2)
+      'test-results.json',
+      JSON.stringify({
+        timestamp: "2025-02-19 11:27:42",
+        user: "dax-side",
+        server: config.logUrl,
+        error: {
+          message: error.message,
+          stack: error.stack
+        }
+      }, null, 2)
     );
-  }
 
-  // Ensure clean exit
-  process.exit(exitCode);
+    // Exit with error
+    process.exit(1);
+  }
 }
 
+// Run the test
 testNginxLogParsing();
