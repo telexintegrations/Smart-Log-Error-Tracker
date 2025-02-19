@@ -1,0 +1,41 @@
+name: LogParser Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    # Add timeout to prevent hanging builds
+    timeout-minutes: 10
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Use Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+        cache: 'npm'  # Enable npm caching
+        
+    - name: Install dependencies
+      run: npm ci  # Use ci instead of install for cleaner, more reliable builds
+      
+    - name: Run tests
+      run: npm test
+      env:
+        NODE_ENV: test
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        TEST_TIMESTAMP: '2025-02-19 11:14:23'
+        TEST_USER: 'dax-side'
+        
+    - name: Upload test results
+      if: always()  # Upload results whether tests pass or fail
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-results-2025-02-19-111423
+        path: test-results.json
+        retention-days: 14  # Keep test results for 14 days
