@@ -12,11 +12,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        # Need write permissions to push changes
+        token: ${{ secrets.GITHUB_TOKEN }}
     
     - name: Use Node.js
       uses: actions/setup-node@v4
       with:
-        node-js: '16'
+        node-version: '16'
         cache: 'npm'
 
     - name: Install dependencies
@@ -25,12 +28,45 @@ jobs:
     - name: Run tests
       run: npm test
       
-    - name: Upload test results
+    - name: Upload test results artifact
       uses: actions/upload-artifact@v4
       with:
-        name: test-results-2025-02-19-120045
+        name: test-results-2025-02-19-121905
         path: test/test-results.json
         retention-days: 14
         compression-level: 6
         overwrite: true
         if-no-files-found: warn
+
+    - name: Commit test results
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add test/test-results.json
+        git commit -m "test: update test results
+
+        Timestamp: 2025-02-19 12:19:05
+        User: dax-side
+
+        - Update test results from CI run
+        - Store latest parser stats
+        - Update error analysis
+        - Save current timestamp" || echo "No changes to commit"
+        git push
+
+    - name: Update repository with test results
+      if: success()
+      uses: EndBug/add-and-commit@v9
+      with:
+        add: 'test/test-results.json'
+        message: 'test: update test results [skip ci]
+
+        Timestamp: 2025-02-19 12:19:05
+        User: dax-side
+
+        - Store CI test results
+        - Update parser statistics
+        - Save error analysis
+        - Record current timestamp'
+        default_author: github_actions
+        push: true
