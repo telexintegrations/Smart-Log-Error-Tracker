@@ -30,6 +30,24 @@ class LogParser {
     };
   }
 
+  updateStats(errors) {
+    this.stats.totalChecks++;
+    this.stats.errorsFound += errors.length;
+    this.stats.lastCheckTime = new Date();
+    this.stats.averageErrorsPerCheck = (
+      this.stats.errorsFound / this.stats.totalChecks
+    ).toFixed(2);
+
+    // Update trend statistics
+    const trends = this.analyzeTrends(errors);
+    this.stats.errorTrends = {
+      lastHour: trends.lastHour,
+      lastDay: trends.lastDay,
+      trend: trends.trend,
+      averagePerHour: trends.averagePerHour,
+    };
+  }
+
   getSeverityFromWord(word) {
     return (
       this.severityMap[word.toLowerCase()] || {
@@ -41,7 +59,6 @@ class LogParser {
   }
 
   parseLogLine(line) {
-    // Nginx error log format
     const regex =
       /^(\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2}) \[(\w+)\] (?:(\d+)#\d+: )?(.+)/;
     const match = line.match(regex);
@@ -134,7 +151,6 @@ class LogParser {
 
   analyzeUpstreamStatus(errors) {
     const upstreamErrors = errors.filter((e) => e.message.includes("upstream"));
-
     const services = new Map();
 
     upstreamErrors.forEach((error) => {
@@ -209,15 +225,13 @@ class LogParser {
     };
   }
 
-   async parseLogFile() {
+  async parseLogFile() {
     try {
       let logData;
       
-      if (process.env.NODE_ENV === 'development') {
-        // Use mock data in test environment
+      if (process.env.NODE_ENV === 'test') {
         logData = this.getMockLogs();
       } else {
-        // Make HTTP request to get logs from the server
         const response = await axios.get(this.config.logUrl, {
           timeout: 5000,
           retry: 3,
@@ -230,13 +244,11 @@ class LogParser {
         logData = response.data;
       }
 
-      // Process and analyze logs
       const lines = logData.split('\n').filter(line => line.trim());
       const errors = lines
         .map(line => this.parseLogLine(line))
         .filter(error => error !== null);
 
-      // Update stats and return formatted report
       this.updateStats(errors);
       return this.formatForTelex(errors);
 
@@ -247,18 +259,9 @@ class LogParser {
   }
 
   getMockLogs() {
-    return `2025/02/19 10:55:52 [error] 1234#5678: *123 test error message 1
-2025/02/19 10:55:51 [warning] 1234#5678: *124 test warning message
-2025/02/19 10:55:50 [error] 1234#5678: *125 test error message 2`;
-  }
-      this.updateStats(errors);
-
-      // Format for Telex with enhanced information
-      return this.formatForTelex(errors);
-    } catch (error) {
-      console.error("Error parsing log file:", error);
-      throw error;
-    }
+    return `2025/02/19 11:02:48 [error] 1234#5678: *123 test error message 1
+2025/02/19 11:02:47 [warning] 1234#5678: *124 test warning message
+2025/02/19 11:02:46 [error] 1234#5678: *125 test error message 2`;
   }
 
   getStats() {
@@ -280,17 +283,14 @@ class LogParser {
       };
     }
 
-    // Get recent errors and trends
     const recentErrors = this.filterRecentErrors(errors, 24);
     const trends = this.analyzeTrends(errors);
     const errorCategories = this.categorizeErrors(recentErrors);
     const urlAnalysis = this.analyzeUrlPatterns(recentErrors);
     const upstreamStatus = this.analyzeUpstreamStatus(recentErrors);
 
-    // Group by severity
     const summary = {
-      emergency: recentErrors.filter((e) => e.severityLabel === "EMERGENCY")
-        .length,
+      emergency: recentErrors.filter((e) => e.severityLabel === "EMERGENCY").length,
       error: recentErrors.filter((e) => e.severityLabel === "ERROR").length,
       warning: recentErrors.filter((e) => e.severityLabel === "WARN").length,
       notice: recentErrors.filter((e) => e.severityLabel === "NOTICE").length,
@@ -299,21 +299,18 @@ class LogParser {
     const formatDetailed = (error) =>
       `${error.icon} [${error.severityLabel}] ${error.timestamp} - ${error.processInfo} ${error.message}`;
 
-    // Get most recent errors from each category
     const mostRecentErrors = [
       ...errorCategories.connection.slice(-2),
       ...errorCategories.filesystem.slice(-1),
       ...errorCategories.other.slice(-1),
     ];
 
-    // Create trend indicator
     const trendIndicator =
       trends.trend === "increasing"
         ? "⚠️ Error rate increasing!"
         : "✅ Error rate stable";
     const errorRate = `Average errors per hour: ${trends.averagePerHour}`;
 
-    // Build the message array
     const messageArray = [
       "🔍 Nginx Log Analysis Report:",
       `Time: ${new Date().toISOString()}`,
@@ -337,7 +334,6 @@ class LogParser {
       `- Other Issues: ${errorCategories.other.length}`,
     ];
 
-    // Add URL analysis if there are failed URLs
     if (urlAnalysis.uniqueUrls.length > 0) {
       messageArray.push(
         "",
@@ -348,7 +344,6 @@ class LogParser {
       );
     }
 
-    // Add upstream service analysis if there are upstream issues
     if (upstreamStatus.services.length > 0) {
       messageArray.push(
         "",
@@ -360,7 +355,6 @@ class LogParser {
       );
     }
 
-    // Add recent errors
     messageArray.push(
       "",
       "Most Recent Errors:",
@@ -372,23 +366,6 @@ class LogParser {
     return {
       message: messageArray.join("\n"),
       type: errorCategories.connection.length > 0 ? "error" : "info",
-    };
-  }
-  updateStats(errors) {
-    this.stats.totalChecks++;
-    this.stats.errorsFound += errors.length;
-    this.stats.lastCheckTime = new Date();
-    this.stats.averageErrorsPerCheck = (
-      this.stats.errorsFound / this.stats.totalChecks
-    ).toFixed(2);
-
-    // Update trend statistics
-    const trends = this.analyzeTrends(errors);
-    this.stats.errorTrends = {
-      lastHour: trends.lastHour,
-      lastDay: trends.lastDay,
-      trend: trends.trend,
-      averagePerHour: trends.averagePerHour,
     };
   }
 }
