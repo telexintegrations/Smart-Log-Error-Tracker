@@ -1,6 +1,5 @@
 # Smart-Log-Error-Tracker
 
-
 A Telex integration specialized in monitoring and reporting Nginx error logs. This service analyzes Nginx error logs and reports them through Telex's webhook system, with planned support for remote Nginx instances.
 
 ## Features
