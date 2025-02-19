@@ -1,14 +1,50 @@
 {
   "data": {
+    "date": {
+      "created_at": "2025-02-19 23:08:36",
+      "updated_at": "2025-02-19 23:08:36"
+    },
     "descriptions": {
       "app_name": "Log Error Tracker",
-      "app_description": "Monitors server logs for errors and reports them to Telex channels",
+      "app_description": "Monitors server logs for errors and reports them to Telex channels with real-time error detection and severity classification",
       "app_logo": "https://www.keycdn.com/img/blog/error-tracking.png",
       "app_url": "https://smart-log-error-tracker-production.up.railway.app",
       "background_color": "#FF4444"
     },
+    "integration_category": "Monitoring & Logging",
     "integration_type": "interval",
+    "is_active": false,
+    "output": [
+      {
+        "label": "error_notifications",
+        "value": true
+      },
+      {
+        "label": "status_updates",
+        "value": true
+      }
+    ],
+    "key_features": [
+      "Real-time log monitoring and error detection",
+      "Error severity classification and filtering",
+      "Configurable monitoring intervals",
+      "Automated error reporting to Telex channels",
+      "Multiple log file support with custom paths"
+    ],
+    "permissions": {
+      "monitoring_user": {
+        "always_online": true,
+        "display_name": "Log Monitor"
+      }
+    },
     "settings": [
+      {
+        "label": "interval",
+        "type": "text",
+        "required": true,
+        "default": "*/15 * * * *",
+        "description": "Check interval (crontab format)"
+      },
       {
         "label": "logPath",
         "type": "text",
@@ -24,11 +60,27 @@
         "description": "Minimum error severity level to report"
       },
       {
-        "label": "interval",
-        "type": "text",
+        "label": "enableNotifications",
+        "type": "checkbox",
         "required": true,
-        "default": "*/15 * * * *",
-        "description": "Check interval (crontab format)"
+        "default": "Yes",
+        "description": "Enable error notifications"
+      },
+      {
+        "label": "errorSeverity",
+        "type": "dropdown",
+        "required": true,
+        "default": "Low",
+        "options": ["High", "Medium", "Low"],
+        "description": "Error severity level for notifications"
+      },
+      {
+        "label": "notifyRoles",
+        "type": "multi-checkbox",
+        "required": true,
+        "default": "DevOps",
+        "options": ["DevOps", "SysAdmin", "Developer", "Manager"],
+        "description": "Roles to notify on errors"
       }
     ],
     "tick_url": "https://smart-log-error-tracker-production.up.railway.app/tick"
