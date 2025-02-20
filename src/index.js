@@ -1,7 +1,6 @@
 const express = require("express");
 const LogParser = require("./logParser");
 const config = require("./config");
-
 const cors = require('cors'); // Add this line
 
 function createApp() {
