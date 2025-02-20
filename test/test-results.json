@@ -7,14 +7,14 @@
     "formatStyle": "Detailed"
   },
   "analysisResults": {
-    "message": "🔍 Nginx Log Analysis Report:\nTime: 2025-02-20T18:16:14.205Z\n\nError Trends:\n✅ Error rate stable\nLast Hour: 0 errors\nLast 24 Hours: 16 errors\nAverage errors per hour: 0.67\n\nFound 16 errors in last 24 hours (39 total):\n🔴 Emergency/Critical: 0\n🔴 Error: 16\n🟡 Warning: 0\n🟢 Notice: 0\n\nError Categories:\n- Connection Issues: 0\n- Filesystem Issues: 0\n- Process Signals: 0\n- Other Issues: 16\n\nFailed URLs:\n- GET /logs/debug.log HTTP/1.1 (2 times)\n- HEAD /logs/aws/ HTTP/1.1 (1 times)\n- GET /logs/error.log HTTP/1.1 (1 times)\n\nMost Recent Errors:\n🔴 [ERROR] 2025/02/20 16:42:37 - Process 3848 *362 open() \"/var/log/nginx/error.log/laravel.log\" failed (20: Not a directory), client: 223.71.166.92, server: 16.171.58.193, request: \"GET /logs/laravel.log HTTP/1.1\", host: \"16.171.62.147\"\n\nNote: Showing most recent errors from each category.",
+    "message": "🔍 Nginx Log Analysis Report:\nTime: 2025-02-20T18:57:01.080Z\n\nError Trends:\n✅ Error rate stable\nLast Hour: 0 errors\nLast 24 Hours: 16 errors\nAverage errors per hour: 0.67\n\nFound 16 errors in last 24 hours (39 total):\n🔴 Emergency/Critical: 0\n🔴 Error: 16\n🟡 Warning: 0\n🟢 Notice: 0\n\nError Categories:\n- Connection Issues: 0\n- Filesystem Issues: 0\n- Process Signals: 0\n- Other Issues: 16\n\nFailed URLs:\n- GET /logs/debug.log HTTP/1.1 (2 times)\n- HEAD /logs/aws/ HTTP/1.1 (1 times)\n- GET /logs/error.log HTTP/1.1 (1 times)\n\nMost Recent Errors:\n🔴 [ERROR] 2025/02/20 16:42:37 - Process 3848 *362 open() \"/var/log/nginx/error.log/laravel.log\" failed (20: Not a directory), client: 223.71.166.92, server: 16.171.58.193, request: \"GET /logs/laravel.log HTTP/1.1\", host: \"16.171.62.147\"\n\nNote: Showing most recent errors from each category.",
     "type": "info"
   },
   "parserStats": {
     "totalChecks": 1,
     "totalErrorsFound": 39,
     "averageErrorsPerCheck": "39.00",
-    "lastCheckTime": "2025-02-20T18:16:14.204Z",
+    "lastCheckTime": "2025-02-20T18:57:01.079Z",
     "uptime": 0
   }
 }
