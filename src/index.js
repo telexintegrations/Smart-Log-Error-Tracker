@@ -2,7 +2,6 @@ const express = require("express");
 const LogParser = require("./logParser");
 const config = require("./config");
 
-
 function createApp() {
   const app = express();
   app.use(express.json());
@@ -10,54 +9,19 @@ function createApp() {
   // Initialize log parser
   const logParser = new LogParser(config);
 
-  // Integration JSON endpoint - Direct JSON response
+  // Integration JSON endpoint following the documentation example
   app.get("/integration.json", (req, res) => {
     const integrationData = {
       "data": {
-        "date": {
-          "created_at": "2025-02-20 07:11:17",
-          "updated_at": "2025-02-20 07:11:17"
-        },
         "descriptions": {
           "app_name": "Log Error Tracker",
           "app_description": "Monitors server logs for errors and reports them to Telex channels with real-time error detection and severity classification",
-          "app_logo": "https://www.keycdn.com/img/blog/error-tracking.png",
           "app_url": "https://smart-log-error-tracker-production.up.railway.app",
+          "app_logo": "https://www.keycdn.com/img/blog/error-tracking.png",
           "background_color": "#FF4444"
         },
-        "integration_category": "Monitoring & Logging",
         "integration_type": "interval",
-        "is_active": false,
-        "output": [
-          {
-            "label": "error_notifications",
-            "value": true
-          },
-          {
-            "label": "status_updates",
-            "value": true
-          }
-        ],
-        "key_features": [
-          "Real-time log monitoring and error detection",
-          "Error severity classification and filtering",
-          "Configurable monitoring intervals",
-          "Automated error reporting to Telex channels",
-          "Multiple log file support with custom paths"
-        ],
-        "permissions": {
-          "monitoring_user": {
-            "always_online": true,
-            "display_name": "Log Monitor"
-          }
-        },
         "settings": [
-          {
-            "label": "interval",
-            "type": "text",
-            "required": true,
-            "default": "*/15 * * * *"
-          },
           {
             "label": "logPath",
             "type": "text",
@@ -66,33 +30,18 @@ function createApp() {
           },
           {
             "label": "errorThreshold",
-            "type": "number",
+            "type": "text",
             "required": true,
             "default": "1"
           },
           {
-            "label": "enableNotifications",
-            "type": "checkbox",
+            "label": "interval",
+            "type": "text",
             "required": true,
-            "default": "Yes"
-          },
-          {
-            "label": "errorSeverity",
-            "type": "dropdown",
-            "required": true,
-            "default": "Low",
-            "options": ["High", "Medium", "Low"]
-          },
-          {
-            "label": "notifyRoles",
-            "type": "multi-checkbox",
-            "required": true,
-            "default": "DevOps",
-            "options": ["DevOps", "SysAdmin", "Developer", "Manager"]
+            "default": "*/15 * * * *"
           }
         ],
-        "tick_url": "https://smart-log-error-tracker-production.up.railway.app/tick",
-        "target_url": "https://smart-log-error-tracker-production.up.railway.app/webhook"
+        "tick_url": "https://smart-log-error-tracker-production.up.railway.app/tick"
       }
     };
 
@@ -112,17 +61,19 @@ function createApp() {
     });
   });
 
-  // Tick endpoint
+  // Tick endpoint following the documentation example
   app.post("/tick", async (req, res) => {
     try {
-      const payload = req.body;
-      // Start processing in background
+      // Return 202 Accepted immediately as shown in the example
       res.status(202).json({ "status": "accepted" });
+      
+      // Get the payload from the request
+      const payload = req.body;
       
       // Parse logs and prepare response
       const result = await logParser.parseLogFile();
       
-      // Send results back to Telex using the return_url
+      // Send results back to Telex using the return_url following the exact format from documentation
       const data = {
         "message": result.summary || "No new errors detected",
         "username": "Log Error Tracker",
