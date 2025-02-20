@@ -2,6 +2,7 @@ const express = require("express");
 const LogParser = require("./logParser");
 const config = require("./config");
 
+
 function createApp() {
   const app = express();
   app.use(express.json());
