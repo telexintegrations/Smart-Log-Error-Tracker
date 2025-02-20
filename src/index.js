@@ -53,7 +53,8 @@ function createApp() {
             "default": "*/15 * * * *"
           }
         ],
-        "tick_url": "https://smart-log-error-tracker-production.up.railway.app/tick"
+        "tick_url": "https://smart-log-error-tracker-production.up.railway.app/tick",
+        "target_url":"https://smart-log-error-tracker-production.up.railway.app/webhook"
       }
     };
 
