@@ -1,9 +1,18 @@
 const express = require("express");
 const LogParser = require("./logParser");
 const config = require("./config");
+const cors = require('cors'); // Add this line
 
 function createApp() {
   const app = express();
+  
+  // Add CORS middleware before other middleware
+  app.use(cors({
+    origin: 'https://telex.im',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type']
+  }));
+  
   app.use(express.json());
   
   // Initialize log parser
@@ -13,10 +22,10 @@ function createApp() {
   app.get("/integration.json", (req, res) => {
     const integrationData = {
       "data": {
-        isActive: true,
+        "isActive": true,
         "date": {
-          "created_at": "2025-02-20 07:32:31",
-          "updated_at": "2025-02-20 07:32:31"
+          "created_at": "2025-02-20 18:11:26",
+          "updated_at": "2025-02-20 18:11:26"
         },
         "descriptions": {
           "app_name": "Log Error Tracker",
