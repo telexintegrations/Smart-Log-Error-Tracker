@@ -1,8 +1,8 @@
 {
   "data": {
     "date": {
-      "created_at": "2025-02-19 23:08:36",
-      "updated_at": "2025-02-19 23:08:36"
+      "created_at": "2025-02-19 23:57:48",
+      "updated_at": "2025-02-19 23:57:48"
     },
     "descriptions": {
       "app_name": "Log Error Tracker",
@@ -80,10 +80,4 @@
         "required": true,
         "default": "DevOps",
         "options": ["DevOps", "SysAdmin", "Developer", "Manager"],
-        "description": "Roles to notify on errors"
-      }
-    ],
-    "tick_url": "https://smart-log-error-tracker-production.up.railway.app/tick",
-    "target_url":"https://smart-log-error-tracker-production.up.railway.app/webhook"
-  }
-}
+        " ▋
