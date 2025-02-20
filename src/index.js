@@ -13,6 +13,7 @@ function createApp() {
   app.get("/integration.json", (req, res) => {
     const integrationData = {
       "data": {
+        isActive: true,
         "date": {
           "created_at": "2025-02-20 07:32:31",
           "updated_at": "2025-02-20 07:32:31"
