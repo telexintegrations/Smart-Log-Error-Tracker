@@ -14,8 +14,8 @@ function createApp() {
     const integrationData = {
       "data": {
         "date": {
-          "created_at": "2025-02-20 07:29:51",
-          "updated_at": "2025-02-20 07:29:51"
+          "created_at": "2025-02-20 07:32:31",
+          "updated_at": "2025-02-20 07:32:31"
         },
         "descriptions": {
           "app_name": "Log Error Tracker",
@@ -25,6 +25,7 @@ function createApp() {
           "background_color": "#FF4444"
         },
         "integration_type": "interval",
+        "integration_category": "Monitoring & Logging",
         "key_features": [
           "Real-time log monitoring and error detection",
           "Error severity classification and filtering",
