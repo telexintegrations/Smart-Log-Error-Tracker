@@ -13,6 +13,10 @@ function createApp() {
   app.get("/integration.json", (req, res) => {
     const integrationData = {
       "data": {
+        "date": {
+          "created_at": "2025-02-20 07:29:51",
+          "updated_at": "2025-02-20 07:29:51"
+        },
         "descriptions": {
           "app_name": "Log Error Tracker",
           "app_description": "Monitors server logs for errors and reports them to Telex channels with real-time error detection and severity classification",
@@ -21,6 +25,13 @@ function createApp() {
           "background_color": "#FF4444"
         },
         "integration_type": "interval",
+        "key_features": [
+          "Real-time log monitoring and error detection",
+          "Error severity classification and filtering",
+          "Configurable monitoring intervals",
+          "Automated error reporting to Telex channels",
+          "Multiple log file support with custom paths"
+        ],
         "settings": [
           {
             "label": "logPath",
