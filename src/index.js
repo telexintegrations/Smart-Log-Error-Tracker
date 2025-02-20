@@ -1,9 +1,6 @@
 const express = require("express");
 const LogParser = require("./logParser");
 const config = require("./config");
-const path = require("path");  // Add this import
-const fs = require("fs").promises;  // Add this import
-
 
 function createApp() {
   const app = express();
@@ -12,76 +9,109 @@ function createApp() {
   // Initialize log parser
   const logParser = new LogParser(config);
 
-    // Integration JSON endpoint - Reading from file with proper path resolution
-  app.get("/integration.json", async (req, res) => {
-    try {
-      // Try multiple possible paths for the integration.json file
-      const possiblePaths = [
-        path.join(__dirname, "integration.json"),          // /app/src/integration.json
-        path.join(__dirname, "..", "integration.json"),    // /app/integration.json
-        path.join(process.cwd(), "integration.json")       // Current working directory
-      ];
-
-      let integrationData = null;
-      let loadedPath = null;
-
-      // Try each path until we find the file
-      for (const filePath of possiblePaths) {
-        try {
-          integrationData = await fs.readFile(filePath, "utf8");
-          loadedPath = filePath;
-          console.log("Successfully loaded integration.json from:", filePath);
-          break;
-        } catch (err) {
-          console.log("Tried path:", filePath, "- Not found");
-          continue;
-        }
+  // Integration JSON endpoint - Direct JSON response
+  app.get("/integration.json", (req, res) => {
+    const integrationData = {
+      "data": {
+        "date": {
+          "created_at": "2025-02-20 07:11:17",
+          "updated_at": "2025-02-20 07:11:17"
+        },
+        "descriptions": {
+          "app_name": "Log Error Tracker",
+          "app_description": "Monitors server logs for errors and reports them to Telex channels with real-time error detection and severity classification",
+          "app_logo": "https://www.keycdn.com/img/blog/error-tracking.png",
+          "app_url": "https://smart-log-error-tracker-production.up.railway.app",
+          "background_color": "#FF4444"
+        },
+        "integration_category": "Monitoring & Logging",
+        "integration_type": "interval",
+        "is_active": false,
+        "output": [
+          {
+            "label": "error_notifications",
+            "value": true
+          },
+          {
+            "label": "status_updates",
+            "value": true
+          }
+        ],
+        "key_features": [
+          "Real-time log monitoring and error detection",
+          "Error severity classification and filtering",
+          "Configurable monitoring intervals",
+          "Automated error reporting to Telex channels",
+          "Multiple log file support with custom paths"
+        ],
+        "permissions": {
+          "monitoring_user": {
+            "always_online": true,
+            "display_name": "Log Monitor"
+          }
+        },
+        "settings": [
+          {
+            "label": "interval",
+            "type": "text",
+            "required": true,
+            "default": "*/15 * * * *"
+          },
+          {
+            "label": "logPath",
+            "type": "text",
+            "required": true,
+            "default": "/var/log/nginx/error.log"
+          },
+          {
+            "label": "errorThreshold",
+            "type": "number",
+            "required": true,
+            "default": "1"
+          },
+          {
+            "label": "enableNotifications",
+            "type": "checkbox",
+            "required": true,
+            "default": "Yes"
+          },
+          {
+            "label": "errorSeverity",
+            "type": "dropdown",
+            "required": true,
+            "default": "Low",
+            "options": ["High", "Medium", "Low"]
+          },
+          {
+            "label": "notifyRoles",
+            "type": "multi-checkbox",
+            "required": true,
+            "default": "DevOps",
+            "options": ["DevOps", "SysAdmin", "Developer", "Manager"]
+          }
+        ],
+        "tick_url": "https://smart-log-error-tracker-production.up.railway.app/tick",
+        "target_url": "https://smart-log-error-tracker-production.up.railway.app/webhook"
       }
+    };
 
-      if (!integrationData) {
-        throw new Error("integration.json not found in any expected location");
-      }
-
-      const data = JSON.parse(integrationData);
-      
-      // Update timestamps
-      const now = "2025-02-19 23:24:50"; // Using the current UTC time you provided
-      data.data.date = {
-        created_at: now,
-        updated_at: now
-      };
-      
-      // Update the base URL dynamically
-      const baseUrl = `http://${req.get('host')}`;
-      data.data.descriptions.app_url = baseUrl;
-      data.data.tick_url = `${baseUrl}/tick`;
-      
-      res.json(data);
-    } catch (error) {
-      console.error("Error reading integration.json:", error);
-      res.status(404).json({
-        error: "Integration configuration not found",
-        details: error.message,
-        searchedPaths: possiblePaths
-      });
-    }
+    res.json(integrationData);
   });
 
-    // Add the webhook endpoint here
+  // Webhook endpoint
   app.post("/webhook", (req, res) => {
     console.log("Received webhook call:", {
       timestamp: new Date().toISOString(),
       body: req.body
     });
 
-    // Acknowledge receipt of webhook
     res.status(200).json({
       status: "received",
       message: "Webhook received successfully"
     });
   });
 
-  
+  // Tick endpoint
   app.post("/tick", async (req, res) => {
     try {
       const payload = req.body;
