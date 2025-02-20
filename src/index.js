@@ -84,40 +84,83 @@ function createApp() {
     });
   });
 
-  // Tick endpoint following the documentation example
-  app.post("/tick", async (req, res) => {
-    try {
-      // Return 202 Accepted immediately as shown in the example
-      res.status(202).json({ "status": "accepted" });
-      
-      // Get the payload from the request
-      const payload = req.body;
-      
-      // Parse logs and prepare response
-      const result = await logParser.parseLogFile();
-      
-      // Send results back to Telex using the return_url following the exact format from documentation
-      const data = {
-        "message": result.summary || "No new errors detected",
+  // Tick endpoint - This is called periodically by Telex to check for new log errors
+app.post("/tick", async (req, res) => {
+  try {
+    // 1. Immediately return 202 Accepted as required by Telex
+    res.status(202).json({ "status": "accepted" });
+    
+    // 2. Get the configuration from the request body
+    const payload = req.body;
+    const settings = payload.settings || {};
+    
+    // 3. Extract settings with defaults
+    const logPath = settings.logPath || "/var/log/nginx/error.log";
+    const errorThreshold = parseInt(settings.errorThreshold || "1");
+    // Note: interval is handled by Telex, we don't need to process it here
+    
+    // 4. Parse logs and get results
+    const result = await logParser.parseLogFile(logPath);
+    
+    // 5. Prepare the message based on results
+    let message, status;
+    if (result.errors.length >= errorThreshold) {
+      message = `⚠️ Found ${result.errors.length} error(s) in log:\n` + 
+                result.errors.map(error => 
+                  `- [${error.severity}] ${error.message}`
+                ).join('\n');
+      status = "error";
+    } else {
+      message = "✅ No critical errors found in logs";
+      status = "success";
+    }
+
+    // 6. Send results back to Telex
+    await fetch(payload.return_url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'User-Agent': 'Log-Error-Tracker/1.0.0'
+      },
+      body: JSON.stringify({
+        "message": message,
         "username": "Log Error Tracker",
         "event_name": "Log Check",
-        "status": result.errors.length > 0 ? "error" : "success"
-      };
+        "status": status,
+        "timestamp": "2025-02-20 20:21:02", // Current UTC time
+        "performed_by": "dax-side"
+      })
+    });
 
-      // Send results to Telex
-      await fetch(payload.return_url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      });
+    console.log(`Completed log check at ${new Date().toISOString()}`);
 
-    } catch (error) {
-      console.error("Error in tick endpoint:", error);
+  } catch (error) {
+    console.error("Error in tick endpoint:", error);
+    
+    // Even if we encounter an error, try to notify Telex
+    if (req.body && req.body.return_url) {
+      try {
+        await fetch(req.body.return_url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'Log-Error-Tracker/1.0.0'
+          },
+          body: JSON.stringify({
+            "message": `❌ Error checking logs: ${error.message}`,
+            "username": "Log Error Tracker",
+            "event_name": "Log Check Error",
+            "status": "error",
+            "timestamp": "2025-02-20 20:21:02",
+            "performed_by": "dax-side"
+          })
+        });
+      } catch (notifyError) {
+        console.error("Failed to notify Telex of error:", notifyError);
+      }
     }
-  });
-
+  }
+});
   return app;
 }
 
