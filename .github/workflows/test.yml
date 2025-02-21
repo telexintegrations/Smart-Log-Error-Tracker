@@ -37,7 +37,6 @@ jobs:
       with:
         name: test-results-2025-02-21-083358
         path: |
-          test/test-results.json
           test/test-results.txt
         retention-days: 14
         compression-level: 6
@@ -59,7 +58,7 @@ jobs:
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         git pull origin main
-        git add test/test-results.json test/test-results.txt
+        git add test/test-results.txt
         git commit -m "test: update results from CI run
 
         Timestamp: 2025-02-21 08:33:58
