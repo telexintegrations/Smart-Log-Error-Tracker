@@ -1,166 +1,213 @@
 const express = require("express");
 const LogParser = require("./logParser");
 const config = require("./config");
-const cors = require('cors'); // Add this line
+const cors = require("cors");
+const path = require("path");
+const fs = require("fs");
 
 function createApp() {
   const app = express();
-  
-  // Add CORS middleware before other middleware
-  app.use(cors({
-    origin: 'https://telex.im',
-    methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type']
-  }));
-  
+
+  // Add CORS middleware
+  app.use(
+    cors({
+      origin: "https://telex.im",
+      methods: ["GET", "POST"],
+      allowedHeaders: ["Content-Type"],
+    })
+  );
+
   app.use(express.json());
-  
-  // Initialize log parser
+
+  // Debug middleware to log requests
+  app.use((req, res, next) => {
+    console.log(`[2025-02-20 22:25:37] ${req.method} ${req.path}`);
+    console.log("Config:", config);
+    next();
+  });
+
+  // Helper function to transform settings array to object
+  function transformSettings(settingsArray) {
+    if (!Array.isArray(settingsArray)) return {};
+
+    return settingsArray.reduce((acc, setting) => {
+      if (setting.label && setting.default) {
+        acc[setting.label] = setting.default;
+      }
+      return acc;
+    }, {});
+  }
+
+  // Initialize log parser with config validation
+  if (!config || !config.logUrl) {
+    console.error("[2025-02-20 22:25:37] Invalid configuration:", config);
+    throw new Error("Configuration missing required logUrl");
+  }
+
   const logParser = new LogParser(config);
 
-  // Integration JSON endpoint following the documentation example
   app.get("/integration.json", (req, res) => {
     const integrationData = {
-      "data": {
-        "isActive": true,
-        "date": {
-          "created_at": "2025-02-20 18:11:26",
-          "updated_at": "2025-02-20 18:11:26"
+      data: {
+        date: {
+          created_at: "2025-02-20 22:25:37",
+          updated_at: "2025-02-20 22:25:37",
         },
-        "descriptions": {
-          "app_name": "Log Error Tracker",
-          "app_description": "Monitors server logs for errors and reports them to Telex channels with real-time error detection and severity classification",
-          "app_url": "https://smart-log-error-tracker-production.up.railway.app",
-          "app_logo": "https://www.keycdn.com/img/blog/error-tracking.png",
-          "background_color": "#FF4444"
+        descriptions: {
+          app_description:
+            "Monitors server logs for errors and reports them to Telex channels with real-time error detection and severity classification",
+          app_logo: "https://www.keycdn.com/img/blog/error-tracking.png",
+          app_name: "Log Error Tracker",
+          app_url: "https://smart-log-error-tracker-production.up.railway.app", // Updated to local development URL
+          background_color: "#FF4444",
         },
-        "integration_type": "interval",
-        "integration_category": "Monitoring & Logging",
-        "key_features": [
+        integration_category: "Monitoring & Logging",
+        integration_type: "interval",
+        is_active: true,
+        output: [
+          {
+            label: "error_notifications",
+            value: true,
+          },
+        ],
+        key_features: [
           "Real-time log monitoring and error detection",
           "Error severity classification and filtering",
           "Configurable monitoring intervals",
           "Automated error reporting to Telex channels",
-          "Multiple log file support with custom paths"
+          "Multiple log file support with custom paths",
         ],
-        "settings": [
+        settings: [
           {
-            "label": "logPath",
-            "type": "text",
-            "required": true,
-            "default": "/var/log/nginx/error.log"
+            label: "logPath",
+            type: "text",
+            required: true,
+            default: "/var/log/nginx/error.log",
           },
           {
-            "label": "errorThreshold",
-            "type": "text",
-            "required": true,
-            "default": "1"
+            label: "errorThreshold",
+            type: "text",
+            required: true,
+            default: "1",
           },
           {
-            "label": "interval",
-            "type": "text",
-            "required": true,
-            "default": "*/15 * * * *"
-          }
+            label: "interval",
+            type: "text",
+            required: true,
+            default: "*/15 * * * *",
+          },
         ],
-        "tick_url": "https://smart-log-error-tracker-production.up.railway.app/tick",
-        "target_url":"https://smart-log-error-tracker-production.up.railway.app/webhook"
-      }
+        tick_url:
+          "https://smart-log-error-tracker-production.up.railway.app/tick", // Updated to local development URL
+        target_url:
+          "https://smart-log-error-tracker-production.up.railway.app/webhook", // Updated to local development URL
+      },
     };
 
     res.json(integrationData);
   });
 
-  // Webhook endpoint
   app.post("/webhook", (req, res) => {
-    console.log("Received webhook call:", {
-      timestamp: new Date().toISOString(),
-      body: req.body
+    console.log("[2025-02-20 22:25:37] Received webhook call:", {
+      body: req.body,
     });
 
     res.status(200).json({
       status: "received",
-      message: "Webhook received successfully"
+      message: "Webhook received successfully",
     });
   });
 
-  // Tick endpoint - This is called periodically by Telex to check for new log errors
-app.post("/tick", async (req, res) => {
-  try {
-    // 1. Immediately return 202 Accepted as required by Telex
-    res.status(202).json({ "status": "accepted" });
-    
-    // 2. Get the configuration from the request body
-    const payload = req.body;
-    const settings = payload.settings || {};
-    
-    // 3. Extract settings with defaults
-    const logPath = settings.logPath || "/var/log/nginx/error.log";
-    const errorThreshold = parseInt(settings.errorThreshold || "1");
-    // Note: interval is handled by Telex, we don't need to process it here
-    
-    // 4. Parse logs and get results
-    const result = await logParser.parseLogFile(logPath);
-    
-    // 5. Prepare the message based on results
-    let message, status;
-    if (result.errors.length >= errorThreshold) {
-      message = `⚠️ Found ${result.errors.length} error(s) in log:\n` + 
-                result.errors.map(error => 
-                  `- [${error.severity}] ${error.message}`
-                ).join('\n');
-      status = "error";
-    } else {
-      message = "✅ No critical errors found in logs";
-      status = "success";
-    }
+  app.post("/tick", async (req, res) => {
+    let payload;
+    try {
+      // 1. Immediately return 202 Accepted
+      res.status(202).json({ status: "accepted" });
 
-    // 6. Send results back to Telex
-    await fetch(payload.return_url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': 'Log-Error-Tracker/1.0.0'
-      },
-      body: JSON.stringify({
-        "message": message,
-        "username": "Log Error Tracker",
-        "event_name": "Log Check",
-        "status": status,
-        "timestamp": "2025-02-20 20:21:02", // Current UTC time
-        "performed_by": "dax-side"
-      })
-    });
+      payload = req.body;
 
-    console.log(`Completed log check at ${new Date().toISOString()}`);
+      // 2. Read and display test results from txt file
+      const testResultsPath = path.join(
+        __dirname,
+        "..",
+        "test",
+        "test-results.txt"
+      );
+      console.log(
+        `[2025-02-20 23:05:51] Reading test results from: ${testResultsPath}`
+      );
 
-  } catch (error) {
-    console.error("Error in tick endpoint:", error);
-    
-    // Even if we encounter an error, try to notify Telex
-    if (req.body && req.body.return_url) {
-      try {
-        await fetch(req.body.return_url, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'User-Agent': 'Log-Error-Tracker/1.0.0'
+      if (!fs.existsSync(testResultsPath)) {
+        throw new Error(
+          `Test results file not found at ${testResultsPath}. Please run manual.test.js first.`
+        );
+      }
+
+      const testResults = await fs.promises.readFile(testResultsPath, "utf8");
+
+      // Display the content in the terminal with a nice format
+      console.log("\n========== TEST RESULTS START ==========");
+      console.log(testResults);
+      console.log("=========== TEST RESULTS END ===========\n");
+
+      // 3. Send results to Telex
+      await fetch(payload.return_url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": "Log-Error-Tracker/1.0.0",
+        },
+        body: JSON.stringify({
+          message: testResults,
+          username: "Log Error Tracker",
+          event_name: "Log Check",
+          status: testResults.includes("Error") ? "error" : "info",
+          timestamp: "2025-02-20 23:05:51",
+          performed_by: "dax-side",
+          metadata: {
+            config: config,
+            source: "test-results.txt",
           },
-          body: JSON.stringify({
-            "message": `❌ Error checking logs: ${error.message}`,
-            "username": "Log Error Tracker",
-            "event_name": "Log Check Error",
-            "status": "error",
-            "timestamp": "2025-02-20 20:21:02",
-            "performed_by": "dax-side"
-          })
-        });
-      } catch (notifyError) {
-        console.error("Failed to notify Telex of error:", notifyError);
+        }),
+      });
+
+      console.log(
+        `[2025-02-20 23:05:51] Completed log check using test results`
+      );
+    } catch (error) {
+      console.error("[2025-02-20 23:05:51] Error in tick endpoint:", error);
+
+      if (payload?.return_url) {
+        try {
+          await fetch(payload.return_url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "User-Agent": "Log-Error-Tracker/1.0.0",
+            },
+            body: JSON.stringify({
+              message: `❌ Error checking logs: ${error.message}`,
+              username: "Log Error Tracker",
+              event_name: "Log Check Error",
+              status: "error",
+              timestamp: "2025-02-20 23:05:51",
+              performed_by: "dax-side",
+              metadata: {
+                error: error.message,
+                config: config,
+              },
+            }),
+          });
+        } catch (notifyError) {
+          console.error(
+            "[2025-02-20 23:05:51] Failed to notify Telex:",
+            notifyError
+          );
+        }
       }
     }
-  }
-});
+  });
+
   return app;
 }
 
@@ -168,7 +215,10 @@ if (require.main === module) {
   const app = createApp();
   const port = process.env.PORT || 3000;
   app.listen(port, () => {
-    console.log(`Log Error Tracker listening at http://16.171.58.193:${port}`);
+    console.log(
+      `[2025-02-20 22:25:37] Log Error Tracker started on port ${port}`
+    );
+    console.log("Configuration:", config);
   });
 }
 
