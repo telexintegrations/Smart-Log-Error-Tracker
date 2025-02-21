@@ -4,7 +4,23 @@ const path = require("path");
 
 class LogParser {
   constructor(config) {
+    if (!config) {
+      throw new Error("LogParser requires a configuration object");
+    }
+
+    if (!config.logUrl) {
+      throw new Error("Configuration missing required logUrl parameter");
+    }
+
     this.config = config;
+
+    // Log initialization
+    console.log(
+      `[${new Date().toISOString()}] LogParser initialized with URL: ${
+        this.config.logUrl
+      }`
+    );
+
     this.lastCheckTime = null;
     this.stats = {
       totalChecks: 0,
@@ -227,33 +243,61 @@ class LogParser {
 
   async parseLogFile() {
     try {
-      let logData;
-      
-      // Always use real server logs, remove test environment check
+      if (!this.config.logUrl) {
+        throw new Error("LogUrl is not configured");
+      }
+
+      console.log(
+        `[2025-02-20 21:26:49] Fetching logs from: ${this.config.logUrl}`
+      );
+
       const response = await axios.get(this.config.logUrl, {
         timeout: 5000,
+        headers: {
+          "User-Agent": "Log-Error-Tracker/1.0.0",
+          Accept: "text/plain",
+        },
+        validateStatus: (status) => status === 200,
         retry: 3,
-        retryDelay: 1000
+        retryDelay: 1000,
       });
-      
-      if (!response.data) {
-        throw new Error('No log data received');
-      }
-      logData = response.data;
 
-      const lines = logData.split('\n').filter(line => line.trim());
+      if (!response.data) {
+        throw new Error("No log data received from server");
+      }
+
+      const logData = response.data;
+      console.log(
+        `[2025-02-20 21:26:49] Received ${logData.length} bytes of log data`
+      );
+
+      const lines = logData.split("\n").filter((line) => line.trim());
       const errors = lines
-        .map(line => this.parseLogLine(line))
-        .filter(error => error !== null);
+        .map((line) => this.parseLogLine(line))
+        .filter((error) => error !== null);
 
       this.updateStats(errors);
-      return this.formatForTelex(errors);
 
+      const result = this.formatForTelex(errors);
+      console.log(
+        `[2025-02-20 21:26:49] Analysis complete. Found ${errors.length} errors`
+      );
+
+      return result;
     } catch (error) {
-      console.error("Error parsing log file:", error);
-      throw error;
+      console.error(`[2025-02-20 21:26:49] Error parsing log file:`, {
+        message: error.message,
+        config: {
+          logUrl: this.config.logUrl,
+          errorThreshold: this.config.errorThreshold,
+        },
+        error: error.stack,
+      });
+
+      throw new Error(`Failed to parse logs: ${error.message}`);
     }
   }
+
   getStats() {
     return {
       ...this.stats,
@@ -268,11 +312,10 @@ class LogParser {
   formatForTelex(errors) {
     if (errors.length === 0) {
       return {
-        message: "No new errors found in nginx logs.",
+        message: `[2025-02-20 21:26:49] No new errors found in nginx logs.\nMonitored URL: ${this.config.logUrl}`,
         type: "info",
       };
     }
-
     const recentErrors = this.filterRecentErrors(errors, 24);
     const trends = this.analyzeTrends(errors);
     const errorCategories = this.categorizeErrors(recentErrors);
@@ -280,7 +323,8 @@ class LogParser {
     const upstreamStatus = this.analyzeUpstreamStatus(recentErrors);
 
     const summary = {
-      emergency: recentErrors.filter((e) => e.severityLabel === "EMERGENCY").length,
+      emergency: recentErrors.filter((e) => e.severityLabel === "EMERGENCY")
+        .length,
       error: recentErrors.filter((e) => e.severityLabel === "ERROR").length,
       warning: recentErrors.filter((e) => e.severityLabel === "WARN").length,
       notice: recentErrors.filter((e) => e.severityLabel === "NOTICE").length,
