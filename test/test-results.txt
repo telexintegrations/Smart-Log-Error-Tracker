@@ -4,33 +4,34 @@ User: dax-side
 
 Analysis Results:
 🔍 Nginx Log Analysis Report:
-Time: 2025-02-21T09:07:23.897Z
+Time: 2025-02-21T12:55:45.692Z
 
 Error Trends:
-⚠️ Error rate increasing!
-Last Hour: 2518 errors
-Last 24 Hours: 2518 errors
-Average errors per hour: 104.92
+✅ Error rate stable
+Last Hour: 0 errors
+Last 24 Hours: 2537 errors
+Average errors per hour: 105.71
 
-Found 2518 errors in last 24 hours (2518 total):
+Found 2537 errors in last 24 hours (2537 total):
 🔴 Emergency/Critical: 0
-🔴 Error: 10
+🔴 Error: 13
 🟡 Warning: 0
-🟢 Notice: 23
+🟢 Notice: 39
 
 Error Categories:
 - Connection Issues: 1
 - Filesystem Issues: 0
-- Process Signals: 8
-- Other Issues: 2518
+- Process Signals: 13
+- Other Issues: 2537
 
 Failed URLs:
-- GET / HTTP/1.1 (10 times)
+- GET / HTTP/1.1 (11 times)
 - /logs? (3 times)
+- GET / HTTP/1.0 (1 times)
 
 Most Recent Errors:
 🔍 [DEBUG] 2025/02/21 08:29:47 - Process 11180 *7 http header: "Proxy-Connection: keep-alive"
-🔴 [ERROR] 2025/02/21 09:04:44 - Process 11519 *22 directory index of "/var/www/html/" is forbidden, client: 102.88.111.40, server: _, request: "GET / HTTP/1.1", host: "16.171.62.147"
+🔴 [ERROR] 2025/02/21 10:29:01 - Process 11549 *50 open() "/var/log/nginx/error.log/logs" failed (20: Not a directory), client: 102.88.111.40, server: _, request: "GET /logs/logs HTTP/1.1", host: "16.171.62.147"
 
 Note: Showing most recent errors from each category.
 
