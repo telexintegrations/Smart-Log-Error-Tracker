@@ -4,17 +4,17 @@ User: dax-side
 
 Analysis Results:
 🔍 Nginx Log Analysis Report:
-Time: 2025-02-21T12:55:45.692Z
+Time: 2025-02-21T23:31:03.214Z
 
 Error Trends:
 ✅ Error rate stable
 Last Hour: 0 errors
-Last 24 Hours: 2537 errors
-Average errors per hour: 105.71
+Last 24 Hours: 2550 errors
+Average errors per hour: 106.25
 
-Found 2537 errors in last 24 hours (2537 total):
+Found 2550 errors in last 24 hours (2550 total):
 🔴 Emergency/Critical: 0
-🔴 Error: 13
+🔴 Error: 26
 🟡 Warning: 0
 🟢 Notice: 39
 
@@ -22,7 +22,7 @@ Error Categories:
 - Connection Issues: 1
 - Filesystem Issues: 0
 - Process Signals: 13
-- Other Issues: 2537
+- Other Issues: 2550
 
 Failed URLs:
 - GET / HTTP/1.1 (11 times)
@@ -31,7 +31,7 @@ Failed URLs:
 
 Most Recent Errors:
 🔍 [DEBUG] 2025/02/21 08:29:47 - Process 11180 *7 http header: "Proxy-Connection: keep-alive"
-🔴 [ERROR] 2025/02/21 10:29:01 - Process 11549 *50 open() "/var/log/nginx/error.log/logs" failed (20: Not a directory), client: 102.88.111.40, server: _, request: "GET /logs/logs HTTP/1.1", host: "16.171.62.147"
+🔴 [ERROR] 2025/02/21 20:08:30 - Process 11549 *275 open() "/var/log/nginx/error.log/phpinfo.php" failed (20: Not a directory), client: 158.160.162.122, server: _, request: "HEAD /logs/phpinfo.php HTTP/1.1", host: "16.171.62.147"
 
 Note: Showing most recent errors from each category.
 
