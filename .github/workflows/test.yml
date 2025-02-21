@@ -35,12 +35,23 @@ jobs:
     - name: Upload test results
       uses: actions/upload-artifact@v4
       with:
-        name: test-results-2025-02-19-123309
-        path: test/test-results.json
+        name: test-results-2025-02-21-083358
+        path: |
+          test/test-results.json
+          test/test-results.txt
         retention-days: 14
         compression-level: 6
         overwrite: true
         if-no-files-found: warn
+
+    - name: Update test results text file
+      run: |
+        echo "Test Results Summary" > test/test-results.txt
+        echo "===================" >> test/test-results.txt
+        echo "Timestamp: 2025-02-21 08:33:58" >> test/test-results.txt
+        echo "User: dax-side" >> test/test-results.txt
+        echo "" >> test/test-results.txt
+        cat test/test-results.json >> test/test-results.txt
 
     - name: Push test results
       if: github.event_name != 'pull_request'
@@ -48,15 +59,16 @@ jobs:
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         git pull origin main
-        git add test/test-results.json
+        git add test/test-results.json test/test-results.txt
         git commit -m "test: update results from CI run
 
-        Timestamp: 2025-02-19 12:33:09
+        Timestamp: 2025-02-21 08:33:58
         User: dax-side
 
         - Store test execution results
         - Update parser statistics
         - Record current timestamp
+        - Update text results file
         - CI run: ${GITHUB_RUN_ID}" || echo "No changes to commit"
         git push
       env:
