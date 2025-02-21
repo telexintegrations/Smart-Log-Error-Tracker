@@ -1,1 +1,37 @@
+=== Nginx Log Analysis Results ===
+Time: 2025-02-20 23:01:06
+User: dax-side
 
+Analysis Results:
+🔍 Nginx Log Analysis Report:
+Time: 2025-02-21T08:45:34.551Z
+
+Error Trends:
+⚠️ Error rate increasing!
+Last Hour: 1193 errors
+Last 24 Hours: 1193 errors
+Average errors per hour: 49.71
+
+Found 1193 errors in last 24 hours (1193 total):
+🔴 Emergency/Critical: 0
+🔴 Error: 2
+🟡 Warning: 0
+🟢 Notice: 7
+
+Error Categories:
+- Connection Issues: 1
+- Filesystem Issues: 0
+- Process Signals: 3
+- Other Issues: 1193
+
+Failed URLs:
+- GET / HTTP/1.1 (2 times)
+
+Most Recent Errors:
+🔍 [DEBUG] 2025/02/21 08:29:47 - Process 11180 *7 http header: "Proxy-Connection: keep-alive"
+🔍 [DEBUG] 2025/02/21 08:45:34 - Process 11180 *14 add cleanup: 0000572EE8D377B0
+
+Note: Showing most recent errors from each category.
+
+=== End of Report ===
+Test results have been saved to: /home/runner/work/Smart-Log-Error-Tracker/Smart-Log-Error-Tracker/test/test-results.txt
