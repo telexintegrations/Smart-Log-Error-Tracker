@@ -1,8 +1,0 @@
-{
-  "timestamp": "2025-02-19 12:00:45",
-  "user": "dax-side",
-  "error": {
-    "message": "No log data received",
-    "stack": "Error: No log data received\n    at LogParser.parseLogFile (/home/runner/work/Smart-Log-Error-Tracker/Smart-Log-Error-Tracker/src/logParser.js:240:15)\n    at processTicksAndRejections (node:internal/process/task_queues:96:5)\n    at async testNginxLogParsing (/home/runner/work/Smart-Log-Error-Tracker/Smart-Log-Error-Tracker/test/manual.test.js:22:20)"
-  }
-}
