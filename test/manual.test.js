@@ -4,7 +4,7 @@ const fs = require("fs").promises;
 const path = require("path");
 
 async function testNginxLogParsing() {
-  const timestamp = "2025-02-19 12:00:45";
+  const timestamp = "2025-02-20 23:01:06";
   const user = "dax-side";
 
   console.log("=== Nginx Log Parser Test ===");
@@ -21,73 +21,43 @@ async function testNginxLogParsing() {
     console.log("\nFetching nginx logs...");
     const result = await parser.parseLogFile();
 
-    console.log("\n=== Analysis Results ===");
-    console.log(result.message);
+    // Create the test output as text
+    const testOutput = [
+      "=== Nginx Log Analysis Results ===",
+      `Time: ${timestamp}`,
+      `User: ${user}`,
+      "",
+      "Analysis Results:",
+      result.message,
+      "",
+      "=== End of Report ===",
+    ].join("\n");
 
-    console.log("\n=== Parser Stats ===");
-    const stats = parser.getStats();
-    console.log("Total Checks:", stats.totalChecks);
-    console.log("Total Errors Found:", stats.errorsFound);
-    console.log("Average Errors/Check:", stats.averageErrorsPerCheck);
-    console.log("Last Check:", stats.lastCheckTime.toISOString());
-    console.log("Uptime (seconds):", stats.uptime);
-
-    // Store all results in a JSON structure
-    const testResults = {
-      timestamp,
-      user,
-      config: {
-        logPath: "/var/log/nginx/error.log",
-        errorThreshold: config.errorThreshold,
-        formatStyle: config.formatStyle,
-      },
-      analysisResults: result,
-      parserStats: {
-        totalChecks: stats.totalChecks,
-        totalErrorsFound: stats.errorsFound,
-        averageErrorsPerCheck: stats.averageErrorsPerCheck,
-        lastCheckTime: stats.lastCheckTime,
-        uptime: stats.uptime,
-      }
-    };
-
-    // Create test directory if it doesn't exist
-    const testDir = path.join(process.cwd(), 'test');
+    // Save to txt file
+    const testDir = path.join(__dirname);
     await fs.mkdir(testDir, { recursive: true });
-
-    // Save results to JSON file in test folder
-    const resultPath = path.join(testDir, 'test-results.json');
-    await fs.writeFile(
-      resultPath,
-      JSON.stringify(testResults, null, 2)
-    );
+    const resultPath = path.join(testDir, "test-results.txt");
+    await fs.writeFile(resultPath, testOutput);
 
     console.log("\nTest results have been saved to:", resultPath);
   } catch (error) {
     console.error("\n❌ Test failed:");
-    console.error("Error details:", error.message);
-    console.error("Stack trace:", error.stack);
+    const errorOutput = [
+      "=== Nginx Log Analysis Error ===",
+      `Time: ${timestamp}`,
+      `User: ${user}`,
+      "",
+      "Error Details:",
+      error.message,
+      "",
+      "=== End of Error Report ===",
+    ].join("\n");
 
-    // Store error in JSON
-    const testResults = {
-      timestamp,
-      user,
-      error: {
-        message: error.message,
-        stack: error.stack,
-      }
-    };
-
-    // Create test directory if it doesn't exist
-    const testDir = path.join(process.cwd(), 'test');
+    // Save error to txt file
+    const testDir = path.join(__dirname);
     await fs.mkdir(testDir, { recursive: true });
-
-    // Save error results to JSON file in test folder
-    const resultPath = path.join(testDir, 'test-results.json');
-    await fs.writeFile(
-      resultPath,
-      JSON.stringify(testResults, null, 2)
-    );
+    const resultPath = path.join(testDir, "test-results.txt");
+    await fs.writeFile(resultPath, errorOutput);
 
     console.error("\n✗ Error details saved to:", resultPath);
   }
