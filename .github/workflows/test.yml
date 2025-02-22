@@ -40,7 +40,7 @@ jobs:
         echo "User: dax-side" >> test/test-results.txt
         echo "" >> test/test-results.txt
         echo "Test Execution Results:" >> test/test-results.txt
-        npm test >> test/test-results.txt 2>&1
+        run: npm run test:manual >> test/test-results.txt 2>&1
       
     - name: Upload test results
       uses: actions/upload-artifact@v4
