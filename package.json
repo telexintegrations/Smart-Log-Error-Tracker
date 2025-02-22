@@ -4,7 +4,7 @@
   "description": "A Telex integration for monitoring and reporting server log errors",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
+    "start": "node /index.js",
     "test": "node test/manual.test.js"
   },
   "author": "dax-side",
