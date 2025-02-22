@@ -33,7 +33,6 @@ jobs:
       
     - name: Run tests and save results
       run: |
-        mkdir -p test
         echo "Test Results Summary" > test/test-results.txt
         echo "===================" >> test/test-results.txt
         echo "Timestamp: 2025-02-21 08:43:44" >> test/test-results.txt
