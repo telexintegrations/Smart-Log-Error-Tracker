@@ -5,8 +5,6 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-  schedule:
-    - cron: "*/5 * * * *"  # This runs every 5 minutes
 
 permissions:
   contents: write
@@ -35,7 +33,7 @@ jobs:
         mkdir -p test
         echo "Test Results Summary" > test/test-results.txt
         echo "===================" >> test/test-results.txt
-        echo "Timestamp: $(date -u +'%Y-%m-%d %H:%M:%S')" >> test/test-results.txt
+        echo "Timestamp: 2025-02-21 08:43:44" >> test/test-results.txt
         echo "User: dax-side" >> test/test-results.txt
         echo "" >> test/test-results.txt
         echo "Test Execution Results:" >> test/test-results.txt
@@ -44,7 +42,7 @@ jobs:
     - name: Upload test results
       uses: actions/upload-artifact@v4
       with:
-        name: test-results-$(date -u +'%Y-%m-%d-%H%M%S')
+        name: test-results-2025-02-21-084344
         path: test/test-results.txt
         retention-days: 14
         compression-level: 6
@@ -60,7 +58,7 @@ jobs:
         git add test/test-results.txt
         git commit -m "test: update results from CI run
 
-        Timestamp: $(date -u +'%Y-%m-%d %H:%M:%S')
+        Timestamp: 2025-02-21 08:43:44
         User: dax-side
 
         - Store test execution results
