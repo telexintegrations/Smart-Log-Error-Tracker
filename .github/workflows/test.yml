@@ -1,10 +1,13 @@
 name: LogParser Tests
 
 on:
+  schedule:
+    - cron: "*/5 * * * *"   # Runs every 5 minutes (UTC)
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:       # Optional: for manual trigger
 
 permissions:
   contents: write
@@ -15,55 +18,55 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Use Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '16'
-        cache: 'npm'
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+          cache: 'npm'
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
       
-    - name: Run tests and save results
-      run: |
-        mkdir -p test
-        echo "Test Results Summary" > test/test-results.txt
-        echo "===================" >> test/test-results.txt
-        echo "Timestamp: 2025-02-21 08:43:44" >> test/test-results.txt
-        echo "User: dax-side" >> test/test-results.txt
-        echo "" >> test/test-results.txt
-        echo "Test Execution Results:" >> test/test-results.txt
-        npm test >> test/test-results.txt 2>&1
+      - name: Run tests and save results
+        run: |
+          mkdir -p test
+          echo "Test Results Summary" > test/test-results.txt
+          echo "===================" >> test/test-results.txt
+          echo "Timestamp: $(date -u +'%Y-%m-%d %H:%M:%S')" >> test/test-results.txt
+          echo "User: dax-side" >> test/test-results.txt
+          echo "" >> test/test-results.txt
+          echo "Test Execution Results:" >> test/test-results.txt
+          npm test >> test/test-results.txt 2>&1
       
-    - name: Upload test results
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-results-2025-02-21-084344
-        path: test/test-results.txt
-        retention-days: 14
-        compression-level: 6
-        overwrite: true
-        if-no-files-found: warn
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-$(date -u +'%Y-%m-%d-%H%M%S')
+          path: test/test-results.txt
+          retention-days: 14
+          compression-level: 6
+          overwrite: true
+          if-no-files-found: warn
 
-    - name: Push test results
-      if: github.event_name != 'pull_request'
-      run: |
-        git config --local user.email "github-actions[bot]@users.noreply.github.com"
-        git config --local user.name "github-actions[bot]"
-        git pull origin main
-        git add test/test-results.txt
-        git commit -m "test: update results from CI run
-
-        Timestamp: 2025-02-21 08:43:44
-        User: dax-side
-
-        - Store test execution results
-        - Update test results file
-        - CI run: ${GITHUB_RUN_ID}" || echo "No changes to commit"
-        git push
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
+      - name: Push test results
+        if: github.event_name != 'pull_request'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git pull origin main
+          git add test/test-results.txt
+          git commit -m "test: update results from CI run
+          
+          Timestamp: $(date -u +'%Y-%m-%d %H:%M:%S')
+          User: dax-side
+          
+          - Store test execution results
+          - Update test results file
+          - CI run: ${GITHUB_RUN_ID}" || echo "No changes to commit"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
