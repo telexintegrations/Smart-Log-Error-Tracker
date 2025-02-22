@@ -30,4 +30,3 @@ Most Recent Errors:
 Note: Showing most recent errors from each category.
 
 === End of Report ===
-Test results have been saved to: /home/runner/work/Smart-Log-Error-Tracker/Smart-Log-Error-Tracker/test/test-results.txt
