@@ -4,7 +4,7 @@ User: dax-side
 
 Analysis Results:
 🔍 Nginx Log Analysis Report:
-Time: 2025-02-22T11:35:18.237Z
+Time: 2025-02-22T11:38:59.105Z
 
 Error Trends:
 ⚠️ Error rate increasing!
@@ -30,3 +30,4 @@ Most Recent Errors:
 Note: Showing most recent errors from each category.
 
 === End of Report ===
+Test results have been saved to: /home/runner/work/Smart-Log-Error-Tracker/Smart-Log-Error-Tracker/test/test-results.txt
