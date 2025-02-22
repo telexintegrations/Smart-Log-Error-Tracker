@@ -1,3 +1,4 @@
+require("dotenv/config");
 const LogParser = require("../src/logParser");
 const config = require("../src/config");
 const fs = require("fs").promises;
