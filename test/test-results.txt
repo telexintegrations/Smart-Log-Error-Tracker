@@ -4,28 +4,28 @@ User: dax-side
 
 Analysis Results:
 🔍 Nginx Log Analysis Report:
-Time: 2025-02-22T11:21:26.982Z
+Time: 2025-02-22T11:35:18.237Z
 
 Error Trends:
-✅ Error rate stable
-Last Hour: 0 errors
-Last 24 Hours: 48 errors
-Average errors per hour: 2.00
+⚠️ Error rate increasing!
+Last Hour: 16 errors
+Last 24 Hours: 64 errors
+Average errors per hour: 2.67
 
-Found 48 errors in last 24 hours (48 total):
+Found 64 errors in last 24 hours (64 total):
 🔴 Emergency/Critical: 0
 🔴 Error: 0
 🟡 Warning: 0
-🟢 Notice: 48
+🟢 Notice: 64
 
 Error Categories:
 - Connection Issues: 0
 - Filesystem Issues: 0
-- Process Signals: 15
-- Other Issues: 48
+- Process Signals: 20
+- Other Issues: 64
 
 Most Recent Errors:
-🟢 [NOTICE] 2025/02/22 07:43:01 - Process 11179 signal 29 (SIGIO) received
+🟢 [NOTICE] 2025/02/22 11:23:04 - Process 11179 signal 29 (SIGIO) received
 
 Note: Showing most recent errors from each category.
 
