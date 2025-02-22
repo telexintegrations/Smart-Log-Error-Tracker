@@ -1,9 +1,33 @@
-=== Nginx Log Analysis Error ===
+=== Nginx Log Analysis Results ===
 Time: 2025-02-20 23:01:06
 User: dax-side
 
-Error Details:
-Failed to parse logs: No log data received from server
+Analysis Results:
+🔍 Nginx Log Analysis Report:
+Time: 2025-02-22T07:41:10.867Z
 
-=== End of Error Report ===
-✗ Error details saved to: /home/runner/work/Smart-Log-Error-Tracker/Smart-Log-Error-Tracker/test/test-results.txt
+Error Trends:
+⚠️ Error rate increasing!
+Last Hour: 32 errors
+Last 24 Hours: 32 errors
+Average errors per hour: 1.33
+
+Found 32 errors in last 24 hours (32 total):
+🔴 Emergency/Critical: 0
+🔴 Error: 0
+🟡 Warning: 0
+🟢 Notice: 32
+
+Error Categories:
+- Connection Issues: 0
+- Filesystem Issues: 0
+- Process Signals: 10
+- Other Issues: 32
+
+Most Recent Errors:
+🟢 [NOTICE] 2025/02/22 07:28:56 - Process 11179 signal 29 (SIGIO) received
+
+Note: Showing most recent errors from each category.
+
+=== End of Report ===
+Test results have been saved to: /home/runner/work/Smart-Log-Error-Tracker/Smart-Log-Error-Tracker/test/test-results.txt
