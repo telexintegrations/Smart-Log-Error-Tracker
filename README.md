@@ -93,21 +93,6 @@ The system classifies Nginx errors into the following severity levels:
 - ℹ️ Info (info) - Severity 1
 - 🔍 Debug (debug) - Severity 0
 
-## Project Structure
-
-```
-nginxLogErrorTracker/
-├── src/
-│   ├── index.js          # Express server setup
-│   ├── config.js         # Configuration management
-│   └── nginxParser.js    # Nginx log parsing logic
-├── test/
-│   ├── sample_logs/      # Test log files
-│   ├── manual.test.js    # Manual testing script
-│   └── nginxParser.test.js # Parser tests
-└── package.json
-```
-
 ## Roadmap
 
 1. Remote Instance Support
