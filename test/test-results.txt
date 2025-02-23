@@ -3,31 +3,8 @@ Time: 2025-02-20 23:01:06
 User: dax-side
 
 Analysis Results:
-🔍 Nginx Log Analysis Report:
-Time: 2025-02-22T23:53:47.986Z
-
-Error Trends:
-✅ Error rate stable
-Last Hour: 0 errors
-Last 24 Hours: 80 errors
-Average errors per hour: 3.33
-
-Found 80 errors in last 24 hours (80 total):
-🔴 Emergency/Critical: 0
-🔴 Error: 0
-🟡 Warning: 0
-🟢 Notice: 80
-
-Error Categories:
-- Connection Issues: 0
-- Filesystem Issues: 0
-- Process Signals: 25
-- Other Issues: 80
-
-Most Recent Errors:
-🟢 [NOTICE] 2025/02/22 16:44:40 - Process 11179 signal 29 (SIGIO) received
-
-Note: Showing most recent errors from each category.
+[2025-02-23T00:34:47.692Z] No new errors found in nginx logs.
+Monitored URL: http://16.171.62.147
 
 === End of Report ===
 Test results have been saved to: /home/runner/work/Smart-Log-Error-Tracker/Smart-Log-Error-Tracker/test/test-results.txt
