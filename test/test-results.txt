@@ -3,34 +3,8 @@ Time: 2025-02-20 23:01:06
 User: dax-side
 
 Analysis Results:
-🔍 Nginx Log Analysis Report:
-Time: 2025-02-23T23:54:14.445Z
-
-Error Trends:
-✅ Error rate stable
-Last Hour: 0 errors
-Last 24 Hours: 1 errors
-Average errors per hour: 0.04
-
-Found 1 errors in last 24 hours (1 total):
-🔴 Emergency/Critical: 0
-🔴 Error: 1
-🟡 Warning: 0
-🟢 Notice: 0
-
-Error Categories:
-- Connection Issues: 0
-- Filesystem Issues: 0
-- Process Signals: 0
-- Other Issues: 1
-
-Failed URLs:
-- POST / HTTP/1.1 (1 times)
-
-Most Recent Errors:
-🔴 [ERROR] 2025/02/23 12:25:09 - Process 16419 *1464 client intended to send too large body: 10485761 bytes, client: 185.91.69.5, server: _, request: "POST / HTTP/1.1", host: "16.171.62.147"
-
-Note: Showing most recent errors from each category.
+[2025-02-24T01:06:45.508Z] No new errors found in nginx logs.
+Monitored URL: http://16.171.62.147
 
 === End of Report ===
 Test results have been saved to: /home/runner/work/Smart-Log-Error-Tracker/Smart-Log-Error-Tracker/test/test-results.txt
