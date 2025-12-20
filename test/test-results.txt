@@ -1,10 +1,9 @@
-=== Nginx Log Analysis Results ===
+=== Nginx Log Analysis Error ===
 Time: 2025-02-20 23:01:06
 User: dax-side
 
-Analysis Results:
-[2025-12-20T08:20:20.872Z] No new errors found in nginx logs.
-Monitored URL: http://16.171.62.147
+Error Details:
+Failed to parse logs: timeout of 5000ms exceeded
 
-=== End of Report ===
-Test results have been saved to: /home/runner/work/Smart-Log-Error-Tracker/Smart-Log-Error-Tracker/test/test-results.txt
+=== End of Error Report ===
+✗ Error details saved to: /home/runner/work/Smart-Log-Error-Tracker/Smart-Log-Error-Tracker/test/test-results.txt
